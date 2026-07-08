@@ -3,9 +3,9 @@ SG CampusSwap �?Auth Service.
 Handles: registration (domain whitelist), email verification, login, JWT tokens.
 """
 
-import uuid
 import random
 import string
+import uuid
 from datetime import datetime, timedelta
 
 from fastapi import HTTPException, status
@@ -15,13 +15,14 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
-from app.models.user import User
 from app.models.review import EmailVerification
+from app.models.user import User
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 # ── Password Hashing ─────────────────────────────────────
+
 
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
@@ -33,30 +34,24 @@ def verify_password(plain: str, hashed: str) -> bool:
 
 # ── JWT ────────────────────────────────
 
+
 def create_access_token(user_id: uuid.UUID) -> str:
-    expire = datetime.utcnow() + timedelta(
-        minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
-    )
+    expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     payload = {"sub": str(user_id), "exp": expire, "type": "access"}
-    return jwt.encode(
-        payload, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM
-    )
+    return jwt.encode(payload, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM)
 
 
 def create_refresh_token(user_id: uuid.UUID) -> str:
-    expire = datetime.utcnow() + timedelta(
-        days=settings.REFRESH_TOKEN_EXPIRE_DAYS
-    )
+    expire = datetime.utcnow() + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
     payload = {"sub": str(user_id), "exp": expire, "type": "refresh"}
-    return jwt.encode(
-        payload, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM
-    )
+    return jwt.encode(payload, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM)
 
 
 def decode_token(token: str) -> dict:
     try:
         return jwt.decode(
-            token, settings.JWT_SECRET,
+            token,
+            settings.JWT_SECRET,
             algorithms=[settings.JWT_ALGORITHM],
         )
     except JWTError:
@@ -67,6 +62,7 @@ def decode_token(token: str) -> dict:
 
 
 # ── Email Domain Validation ────────────
+
 
 def extract_domain(email: str) -> str:
     """Extract the domain portion from an email address."""
@@ -81,12 +77,10 @@ def is_allowed_domain(email: str) -> bool:
 
 # ── Verification Code ──────────────────
 
+
 def generate_verification_code() -> str:
     """Generate a random 6-digit verification code."""
-    return "".join(
-        random.choices(string.digits,
-                       k=settings.VERIFICATION_CODE_LENGTH)
-    )
+    return "".join(random.choices(string.digits, k=settings.VERIFICATION_CODE_LENGTH))
 
 
 async def send_verification_email(email: str, code: str) -> None:
@@ -101,6 +95,7 @@ async def send_verification_email(email: str, code: str) -> None:
 
 
 # ── Registration Flow ──────────────────
+
 
 async def register_user(
     db: AsyncSession, email: str, username: str, password: str, university: str, campus: str | None
