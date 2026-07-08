@@ -1,5 +1,5 @@
 """
-SG CampusSwap �?Auth Service.
+SG CampusSwap �?Auth Service.
 Handles: registration (domain whitelist), email verification, login, JWT tokens.
 """
 
@@ -31,23 +31,34 @@ def verify_password(plain: str, hashed: str) -> bool:
     return pwd_context.verify(plain, hashed)
 
 
-# ── JWT ──────────────────────────────────────────────────
+# ── JWT ────────────────────────────────
 
 def create_access_token(user_id: uuid.UUID) -> str:
-    expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.utcnow() + timedelta(
+        minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
+    )
     payload = {"sub": str(user_id), "exp": expire, "type": "access"}
-    return jwt.encode(payload, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM)
+    return jwt.encode(
+        payload, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM
+    )
 
 
 def create_refresh_token(user_id: uuid.UUID) -> str:
-    expire = datetime.utcnow() + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
+    expire = datetime.utcnow() + timedelta(
+        days=settings.REFRESH_TOKEN_EXPIRE_DAYS
+    )
     payload = {"sub": str(user_id), "exp": expire, "type": "refresh"}
-    return jwt.encode(payload, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM)
+    return jwt.encode(
+        payload, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM
+    )
 
 
 def decode_token(token: str) -> dict:
     try:
-        return jwt.decode(token, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM])
+        return jwt.decode(
+            token, settings.JWT_SECRET,
+            algorithms=[settings.JWT_ALGORITHM],
+        )
     except JWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -55,7 +66,7 @@ def decode_token(token: str) -> dict:
         )
 
 
-# ── Email Domain Validation ──────────────────────────────
+# ── Email Domain Validation ────────────
 
 def extract_domain(email: str) -> str:
     """Extract the domain portion from an email address."""
@@ -68,11 +79,14 @@ def is_allowed_domain(email: str) -> bool:
     return domain in settings.allowed_domains_list
 
 
-# ── Verification Code ────────────────────────────────────
+# ── Verification Code ──────────────────
 
 def generate_verification_code() -> str:
     """Generate a random 6-digit verification code."""
-    return "".join(random.choices(string.digits, k=settings.VERIFICATION_CODE_LENGTH))
+    return "".join(
+        random.choices(string.digits,
+                       k=settings.VERIFICATION_CODE_LENGTH)
+    )
 
 
 async def send_verification_email(email: str, code: str) -> None:
@@ -84,20 +98,9 @@ async def send_verification_email(email: str, code: str) -> None:
     # For now, log the code during development
     if settings.DEBUG:
         print(f"[DEV] Verification code for {email}: {code}")
-    # In production:
-    # import sendgrid
-    # from sendgrid.helpers.mail import Mail
-    # message = Mail(
-    #     from_email=settings.SMTP_FROM,
-    #     to_emails=email,
-    #     subject="SG CampusSwap �?Verify Your Email",
-    #     html_content=f"<p>Your verification code is: <strong>{code}</strong></p>"
-    # )
-    # sg = sendgrid.SendGridAPIClient(api_key=settings.SMTP_PASS)
-    # sg.send(message)
 
 
-# ── Registration Flow ────────────────────────────────────
+# ── Registration Flow ──────────────────
 
 async def register_user(
     db: AsyncSession, email: str, username: str, password: str, university: str, campus: str | None
@@ -157,7 +160,7 @@ async def verify_email_code(db: AsyncSession, email: str, code: str) -> User:
         select(EmailVerification)
         .where(EmailVerification.email == email)
         .where(EmailVerification.code == code)
-        .where(EmailVerification.is_used == False)
+        .where(~EmailVerification.is_used)
         .where(EmailVerification.expires_at > datetime.utcnow())
         .order_by(EmailVerification.created_at.desc())
     )
