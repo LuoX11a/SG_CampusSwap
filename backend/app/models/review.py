@@ -1,5 +1,5 @@
 """
-SG CampusSwap â€?Review + ItemImage + Transaction ORM Models.
+SG CampusSwap ï¿½?Review + ItemImage + Transaction ORM Models.
 """
 
 import enum
@@ -43,7 +43,7 @@ class Review(Base):
     transaction_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("transactions.id", ondelete="SET NULL"), nullable=True
     )
-    rating: Mapped[int] = mapped_column(Integer, nullable=False)  # 1â€?
+    rating: Mapped[int] = mapped_column(Integer, nullable=False)  # 1ï¿½?
     comment: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.utcnow, nullable=False
@@ -53,7 +53,7 @@ class Review(Base):
     reviewee = relationship("User", back_populates="reviews_received", foreign_keys=[reviewee_id])
 
     def __repr__(self) -> str:
-        return f"<Review {self.rating}â˜?by {self.reviewer_id}>"
+        return f"<Review {self.rating}ï¿½?by {self.reviewer_id}>"
 
 
 class TransactionStatus(str, enum.Enum):
