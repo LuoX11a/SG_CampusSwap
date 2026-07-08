@@ -41,6 +41,7 @@ def get_async_session() -> async_sessionmaker[AsyncSession]:
 
 class Base(DeclarativeBase):
     """Base class for all ORM models."""
+
     pass
 
 

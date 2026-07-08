@@ -4,10 +4,11 @@ SG CampusSwap — Pydantic Schemas: User (Request / Response).
 
 import uuid
 from datetime import datetime
+
 from pydantic import BaseModel, Field, field_validator
 
-
 # ── Auth ─────────────────────────────────────────────────
+
 
 class UserRegisterRequest(BaseModel):
     email: str = Field(..., max_length=255, description="University email address")
@@ -47,6 +48,7 @@ class RefreshTokenRequest(BaseModel):
 
 
 # ── User Profile ────────────────────────────────────────
+
 
 class UserProfileResponse(BaseModel):
     id: uuid.UUID
