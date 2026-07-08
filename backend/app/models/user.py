@@ -1,5 +1,5 @@
 """
-SG CampusSwap â€?User ORM Model.
+SG CampusSwap ï¿½?User ORM Model.
 """
 
 import uuid
@@ -39,6 +39,7 @@ class User(Base):
     reviews_received = relationship(
         "Review", back_populates="reviewee", foreign_keys="Review.reviewee_id"
     )
+    refresh_tokens = relationship("RefreshToken", back_populates="user")
 
     def __repr__(self) -> str:
         return f"<User {self.email}>"
