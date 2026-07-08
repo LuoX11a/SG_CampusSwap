@@ -53,7 +53,7 @@ class Review(Base):
     reviewee = relationship("User", back_populates="reviews_received", foreign_keys=[reviewee_id])
 
     def __repr__(self) -> str:
-        return f"<Review {self.rating}�?by {self.reviewer_id}>"
+        return f"<Review {self.rating}* by {self.reviewer_id}>"
 
 
 class TransactionStatus(str, enum.Enum):
@@ -117,3 +117,5 @@ class RefreshToken(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.utcnow, nullable=False
     )
+
+    user = relationship("User", back_populates="refresh_tokens")
