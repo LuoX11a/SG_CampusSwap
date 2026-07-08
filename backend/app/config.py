@@ -3,7 +3,6 @@ SG CampusSwap �?Application Configuration.
 Loaded from environment variables with pydantic-settings.
 """
 
-from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 

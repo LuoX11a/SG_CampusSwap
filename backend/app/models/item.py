@@ -1,12 +1,12 @@
 """
-SG CampusSwap â€?Item ORM Model.
+SG CampusSwap ï¿½?Item ORM Model.
 """
 
 import uuid
 import enum
 from datetime import datetime
 
-from sqlalchemy import String, Integer, Float, Enum, DateTime, ForeignKey, Text
+from sqlalchemy import String, Integer, Enum, DateTime, ForeignKey, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
