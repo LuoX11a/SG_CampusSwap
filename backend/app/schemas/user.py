@@ -4,7 +4,7 @@ SG CampusSwap — Pydantic Schemas: User (Request / Response).
 
 import uuid
 from datetime import datetime
-from pydantic import BaseModel, EmailStr, Field, field_validator
+from pydantic import BaseModel, Field, field_validator
 
 
 # ── Auth ─────────────────────────────────────────────────
