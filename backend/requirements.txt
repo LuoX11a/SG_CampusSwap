@@ -1,0 +1,35 @@
+# SG CampusSwap — Backend Dependencies
+# FastAPI + PostgreSQL + Firebase + Cloudinary
+
+# Core
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.3
+pydantic-settings==2.7.0
+
+# Database
+sqlalchemy[asyncio]==2.0.36
+asyncpg==0.30.0
+alembic==1.14.0
+psycopg2-binary==2.9.10
+
+# Auth
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.18
+
+# Email
+sendgrid==6.11.0
+
+# External Services
+firebase-admin==6.5.0
+cloudinary==1.41.0
+
+# HTTP
+httpx==0.28.1
+aiofiles==24.1.0
+
+# Dev & Testing
+pytest==8.3.4
+pytest-asyncio==0.24.0
+factory-boy==3.3.1
