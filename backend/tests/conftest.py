@@ -3,14 +3,12 @@ Shared fixtures for backend tests.
 """
 
 import pytest
-from httpx import ASGITransport, AsyncClient
+from fastapi.testclient import TestClient
 
 from app.main import app
 
 
 @pytest.fixture
-async def async_client():
-    """Async HTTP client bound to the FastAPI app."""
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
-        yield client
+def client():
+    """HTTP test client bound to the FastAPI app."""
+    return TestClient(app)
