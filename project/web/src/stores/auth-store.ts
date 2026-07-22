@@ -8,6 +8,19 @@
  */
 
 import { create } from 'zustand';
+
+// Helper to extract a readable error message from API validation errors
+function extractError(err: any, fallback: string): string {
+  const detail = err?.response?.data?.detail;
+  if (!detail) return fallback;
+  if (Array.isArray(detail)) {
+    return detail.map((e: any) => {
+      const field = e.loc?.filter((l: string) => l !== 'body').join('.') || '';
+      return field ? `${field}: ${e.msg}` : e.msg;
+    }).join('; ');
+  }
+  return String(detail);
+}
 import apiClient, { setTokens, clearTokens, getAccessToken } from '@/lib/api-client';
 import type { User, LoginRequest, RegisterRequest } from '@/lib/types';
 
@@ -56,11 +69,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         isLoading: false,
       });
     } catch (err: any) {
-      const detail = err.response?.data?.detail;
-      const msg = Array.isArray(detail)
-        ? detail.map((e: any) => e.msg).join('; ')
-        : (detail || 'Login failed. Please try again.');
-      set({ isLoading: false, error: msg });
+      set({ isLoading: false, error: extractError(err, 'Login failed. Please try again.') });
       throw err;
     }
   },
@@ -72,11 +81,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ isLoading: false });
       return { email: res.data.email };
     } catch (err: any) {
-      const detail = err.response?.data?.detail;
-      const msg = Array.isArray(detail)
-        ? detail.map((e: any) => e.msg).join('; ')
-        : (detail || 'Registration failed.');
-      set({ isLoading: false, error: msg });
+      set({ isLoading: false, error: extractError(err, 'Registration failed.') });
       throw err;
     }
   },
@@ -87,12 +92,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       await apiClient.post('/auth/verify', { email, code });
       set({ isLoading: false });
     } catch (err: any) {
-      set({
-        isLoading: false,
-        error: Array.isArray(err.response?.data?.detail)
-          ? err.response.data.detail.map((e: any) => e.msg).join('; ')
-          : (err.response?.data?.detail || 'Verification failed. Invalid code.'),
-      });
+      set({ isLoading: false, error: extractError(err, 'Verification failed.') });
       throw err;
     }
   },
