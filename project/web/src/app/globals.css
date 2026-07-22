@@ -1,0 +1,96 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Design Tokens ─────────────────────────────────── */
+:root {
+  --sidebar-bg: #111827;
+  --sidebar-hover: #1F2937;
+  --sidebar-active: #374151;
+  --sidebar-text: #D1D5DB;
+  --sidebar-text-active: #FFFFFF;
+  --sidebar-icon: #9CA3AF;
+  --sidebar-icon-active: #60A5FA;
+  --sidebar-width: 240px;
+
+  --bg-main: #F3F4F6;
+  --bg-card: #FFFFFF;
+  --color-primary: #3B82F6;
+  --color-accent: #F59E0B;
+  --text-primary: #111827;
+  --text-secondary: #6B7280;
+  --border-color: #E5E7EB;
+
+  /* Mobile safe area */
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --bottom-nav-height: 64px;
+}
+
+/* ─── Base ──────────────────────────────────────────── */
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: var(--bg-main);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  /* Prevent pull-to-refresh on PWA */
+  overscroll-behavior-y: none;
+}
+
+/* ─── Mobile tap highlight ──────────────────────────── */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ─── Touch-friendly minimum tap size ───────────────── */
+@media (max-width: 768px) {
+  button, a, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* ─── Skeleton Animation ────────────────────────────── */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+/* ─── Scrollbar (desktop only) ──────────────────────── */
+@media (min-width: 769px) {
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+  }
+}
+
+/* ─── Focus Ring ─────────────────────────────────────── */
+*:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ─── Mobile Safe Area Padding ───────────────────────── */
+.pb-safe {
+  padding-bottom: var(--safe-area-bottom);
+}
+
+/* ─── Bottom Nav Offset ──────────────────────────────── */
+.pb-nav {
+  padding-bottom: calc(var(--bottom-nav-height) + var(--safe-area-bottom));
+}
