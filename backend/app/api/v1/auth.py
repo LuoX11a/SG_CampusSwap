@@ -173,12 +173,22 @@ async def register(req: RegisterRequest, db: AsyncSession = Depends(get_db)):
         expires_at=datetime.now(timezone.utc) + timedelta(minutes=15),
     )
     db.add(verification)
+
+    # In DEBUG mode, auto-verify the user so they can log in immediately
+    if settings.DEBUG:
+        user.is_verified = True
+        verification.is_used = True
+
     await db.commit()
 
-    return {
+    response = {
         "message": f"Verification code sent to {req.email}",
         "email": req.email,
     }
+    if settings.DEBUG:
+        response["code"] = code
+        response["note"] = "DEBUG mode: user auto-verified"
+    return response
 
 
 @router.post("/verify")
