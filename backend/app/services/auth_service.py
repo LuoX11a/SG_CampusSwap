@@ -6,7 +6,7 @@ Handles: registration (domain whitelist), email verification, login, JWT tokens.
 import random
 import string
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from fastapi import HTTPException, status
 from jose import JWTError, jwt
@@ -36,13 +36,13 @@ def verify_password(plain: str, hashed: str) -> bool:
 
 
 def create_access_token(user_id: uuid.UUID) -> str:
-    expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     payload = {"sub": str(user_id), "exp": expire, "type": "access"}
     return jwt.encode(payload, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM)
 
 
 def create_refresh_token(user_id: uuid.UUID) -> str:
-    expire = datetime.utcnow() + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
+    expire = datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
     payload = {"sub": str(user_id), "exp": expire, "type": "refresh"}
     return jwt.encode(payload, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM)
 
@@ -140,7 +140,7 @@ async def register_user(
     verification = EmailVerification(
         email=email,
         code=code,
-        expires_at=datetime.utcnow() + timedelta(minutes=settings.VERIFICATION_CODE_EXPIRE_MINUTES),
+        expires_at=datetime.now(timezone.utc) + timedelta(minutes=settings.VERIFICATION_CODE_EXPIRE_MINUTES),
     )
     db.add(verification)
     await send_verification_email(email, code)
@@ -156,7 +156,7 @@ async def verify_email_code(db: AsyncSession, email: str, code: str) -> User:
         .where(EmailVerification.email == email)
         .where(EmailVerification.code == code)
         .where(~EmailVerification.is_used)
-        .where(EmailVerification.expires_at > datetime.utcnow())
+        .where(EmailVerification.expires_at > datetime.now(timezone.utc))
         .order_by(EmailVerification.created_at.desc())
     )
     verification = result.scalar_one_or_none()
