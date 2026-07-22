@@ -1,0 +1,45 @@
+# SG CampusSwap — Render Blueprint
+# Auto-deploys backend on push to develop/main
+
+services:
+  - type: web
+    name: sg-campusswap-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_URL_SYNC
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: false
+      - key: SMTP_HOST
+        value: smtp.sendgrid.net
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USER
+        value: apikey
+      - key: SMTP_PASS
+        sync: false
+      - key: SMTP_FROM
+        value: noreply@sgcampusswap.com
+      - key: ALLOWED_EMAIL_DOMAINS
+        value: u.nus.edu,nus.edu.sg,nus.edu,e.ntu.edu.sg,ntu.edu.sg,smu.edu.sg,sutd.edu.sg,suss.edu.sg,sit.edu.sg,singaporetech.edu.sg,connect.np.edu.sg,np.edu.sg,ichat.sp.edu.sg,sp.edu.sg,tp.edu.sg,nyp.edu.sg,rp.edu.sg,lasalle.edu.sg,nafa.edu.sg,mymail.sim.edu.sg,sim.edu.sg,jcu.edu.sg,my.jcu.edu.au,kaplan.edu.sg,psb-academy.edu.sg,curtin.edu.sg,mdis.edu.sg,raffles.edu.sg
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: GOOGLE_APPLICATION_CREDENTIALS
+        sync: false
