@@ -59,7 +59,8 @@ export const useItemStore = create<ItemState>((set, get) => ({
         isLoading: false,
       });
     } catch (err: any) {
-      set({ isLoading: false, error: err.response?.data?.detail || 'Failed to load items' });
+      const detail = err.response?.data?.detail;
+      set({ isLoading: false, error: Array.isArray(detail) ? detail.map((e: any) => e.msg).join('; ') : (detail || 'Failed to load items') });
     }
   },
 

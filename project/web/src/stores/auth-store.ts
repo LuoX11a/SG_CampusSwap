@@ -56,10 +56,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         isLoading: false,
       });
     } catch (err: any) {
-      set({
-        isLoading: false,
-        error: err.response?.data?.detail || 'Login failed. Please try again.',
-      });
+      const detail = err.response?.data?.detail;
+      const msg = Array.isArray(detail)
+        ? detail.map((e: any) => e.msg).join('; ')
+        : (detail || 'Login failed. Please try again.');
+      set({ isLoading: false, error: msg });
       throw err;
     }
   },
@@ -71,10 +72,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ isLoading: false });
       return { email: res.data.email };
     } catch (err: any) {
-      set({
-        isLoading: false,
-        error: err.response?.data?.detail || 'Registration failed.',
-      });
+      const detail = err.response?.data?.detail;
+      const msg = Array.isArray(detail)
+        ? detail.map((e: any) => e.msg).join('; ')
+        : (detail || 'Registration failed.');
+      set({ isLoading: false, error: msg });
       throw err;
     }
   },
@@ -87,7 +89,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     } catch (err: any) {
       set({
         isLoading: false,
-        error: err.response?.data?.detail || 'Verification failed. Invalid code.',
+        error: Array.isArray(err.response?.data?.detail)
+          ? err.response.data.detail.map((e: any) => e.msg).join('; ')
+          : (err.response?.data?.detail || 'Verification failed. Invalid code.'),
       });
       throw err;
     }
