@@ -14,11 +14,24 @@ interface ListingItem {
 }
 
 export default function MyListingsPage() {
-  const { user } = useAuthStore();
+  const { user, isAuthenticated } = useAuthStore();
   const [listings, setListings] = useState<ListingItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'active' | 'sold'>('active');
+
+  if (!isAuthenticated || !user) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center bg-white rounded-xl border border-gray-200 p-8 max-w-sm">
+          <div className="text-5xl mb-4">📦</div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Sign in to manage listings</h2>
+          <p className="text-gray-500 mb-4">View and manage your posted items</p>
+          <Link href="/login" className="inline-flex px-6 py-2.5 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors">Sign In</Link>
+        </div>
+      </div>
+    );
+  }
 
   const fetchMyListings = () => {
     setIsLoading(true);
