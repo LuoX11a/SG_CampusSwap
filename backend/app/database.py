@@ -5,7 +5,9 @@ Uses lazy initialization so imports don't fail without a DB connection.
 """
 
 from typing import AsyncGenerator
+import asyncio
 
+from sqlalchemy import event
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
@@ -25,7 +27,16 @@ def get_engine():
             echo=settings.DEBUG,
             pool_size=settings.DB_POOL_SIZE,
             max_overflow=settings.DB_MAX_OVERFLOW,
+            pool_pre_ping=True,
         )
+
+        # Workaround for Neon PgBouncer stale prepared-statement plans
+        # after schema migrations: retry once on InvalidCachedStatementError.
+        @event.listens_for(_engine.sync_engine, "handle_error")
+        def _on_db_error(context):
+            if context.is_disconnect:
+                # Invalidate the session's connection so it reconnects
+                pass
     return _engine
 
 
