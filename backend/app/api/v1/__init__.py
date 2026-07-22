@@ -12,6 +12,7 @@ from app.api.v1.users import router as users_router
 from app.api.v1.upload import router as upload_router
 from app.api.v1.reviews import router as reviews_router
 from app.api.v1.search import router as search_router
+from app.api.v1.chat import router as chat_router
 
 api_router = APIRouter(prefix="/api/v1")
 
@@ -21,3 +22,4 @@ api_router.include_router(users_router, prefix="/users", tags=["Users"])
 api_router.include_router(upload_router, prefix="/upload", tags=["Upload"])
 api_router.include_router(reviews_router, prefix="/reviews", tags=["Reviews"])
 api_router.include_router(search_router, prefix="/search", tags=["Search"])
+api_router.include_router(chat_router, prefix="/chat", tags=["Chat"])

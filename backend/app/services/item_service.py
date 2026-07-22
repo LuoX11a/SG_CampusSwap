@@ -26,11 +26,11 @@ def parse_price(price_str: str) -> int:
 def get_category_emoji(category: ItemCategory) -> str:
     """Get emoji for a category."""
     emoji_map = {
-        ItemCategory.TEXTBOOK: "📚",
-        ItemCategory.ELECTRONICS: "💻",
-        ItemCategory.FURNITURE: "🪑",
-        ItemCategory.DAILY_ESSENTIALS: "🧴",
-        ItemCategory.OTHER: "📦",
+        ItemCategory.textbook: "📚",
+        ItemCategory.electronics: "💻",
+        ItemCategory.furniture: "🪑",
+        ItemCategory.daily: "🧴",
+        ItemCategory.other: "📦",
     }
     return emoji_map.get(category, "📦")
 
@@ -38,10 +38,10 @@ def get_category_emoji(category: ItemCategory) -> str:
 def get_condition_label(condition: ItemCondition) -> str:
     """Get human-readable label for condition."""
     label_map = {
-        ItemCondition.LIKE_NEW: "Like New",
-        ItemCondition.GOOD: "Good",
-        ItemCondition.FAIR: "Fair",
-        ItemCondition.WORN: "Worn",
+        ItemCondition.like_new: "Like New",
+        ItemCondition.good: "Good",
+        ItemCondition.fair: "Fair",
+        ItemCondition.worn: "Worn",
     }
     return label_map.get(condition, str(condition))
 

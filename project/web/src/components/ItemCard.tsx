@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { MapPin, Star } from 'lucide-react';
-import type { Item, ItemStatus } from '@/lib/types';
-import { formatPrice } from '@/lib/format';
+import type { Item } from '@/lib/types';
+import { formatPrice, timeAgo, formatCategory, formatCondition } from '@/lib/format';
 
 interface ItemCardProps {
   item: Item;
@@ -73,7 +73,7 @@ export default function ItemCard({ item }: ItemCardProps) {
             <MapPin size={14} />
             <span className="truncate">{item.campusLocation}</span>
           </span>
-          {item.seller.ratingAvg && (
+          {item.seller.ratingAvg != null && item.seller.ratingAvg > 0 && (
             <span className="flex items-center gap-1 shrink-0">
               <Star size={14} className="text-amber-400 fill-amber-400" />
               {item.seller.ratingAvg.toFixed(1)}
@@ -88,48 +88,3 @@ export default function ItemCard({ item }: ItemCardProps) {
     </Link>
   );
 }
-
-// ─── Helpers ──────────────────────────────────────────
-
-function formatPrice(cents: number): string {
-  return (cents / 100).toFixed(2);
-}
-
-function formatCategory(cat: string): string {
-  const map: Record<string, string> = {
-    textbook: '📚 Textbook',
-    electronics: '💻 Electronics',
-    furniture: '🪑 Furniture',
-    daily_essentials: '🧴 Daily',
-    other: '📦 Other',
-  };
-  return map[cat] || cat;
-}
-
-function formatCondition(cond: string): string {
-  const map: Record<string, string> = {
-    like_new: 'Like New',
-    good: 'Good',
-    fair: 'Fair',
-    worn: 'Worn',
-  };
-  return map[cond] || cond;
-}
-
-function timeAgo(dateStr: string): string {
-  const now = new Date();
-  const date = new Date(dateStr);
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMs / 3600000);
-  const diffDays = Math.floor(diffMs / 86400000);
-
-  if (diffMins < 1) return 'Just now';
-  if (diffMins < 60) return `${diffMins}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays < 7) return `${diffDays}d ago`;
-  if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
-  return date.toLocaleDateString();
-}
-
-export { formatPrice };

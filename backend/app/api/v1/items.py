@@ -11,7 +11,7 @@ PATCH  /api/v1/items/{id}/status — Mark as sold/reserved/available
 
 from datetime import datetime, timezone
 from typing import Optional, List
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
@@ -319,7 +319,7 @@ async def delete_item(
     if item.seller_id != current_user.id:
         raise HTTPException(status_code=403, detail="You can only delete your own listings")
 
-    await db.delete(item)
+    db.delete(item)
     await db.commit()
     return None
 

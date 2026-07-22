@@ -161,6 +161,86 @@ class ChatService:
         docs = query.stream()
         return sum(1 for _ in docs)
 
+    async def get_user_rooms(self, user_id: str) -> List[Dict[str, Any]]:
+        """Return chat rooms in the format expected by the API."""
+        chats = await self.get_user_chats(user_id)
+        rooms = []
+        for chat in chats:
+            lm = chat.get("last_message")
+            rooms.append({
+                "id": chat.get("id", ""),
+                "participants": chat.get("participants", []),
+                "item_id": chat.get("item_id"),
+                "last_message": {
+                    "text": lm.get("text", "") if lm else "",
+                    "sender_id": lm.get("sender_id", "") if lm else "",
+                    "sent_at": lm.get("sent_at", "") if lm else "",
+                } if lm else None,
+                "created_at": chat.get("created_at", ""),
+            })
+        return rooms
+
+    async def create_room(
+        self,
+        participants: List[str],
+        item_id: Optional[str] = None,
+        initial_message: Optional[str] = None,
+        sender_id: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Create a new chat room and optionally send the first message."""
+        if len(participants) < 2:
+            raise ValueError("At least 2 participants required")
+
+        db = self._get_db()
+        room_id = str(uuid4())
+        now = firestore_timestamp()
+
+        room_data = {
+            "participants": participants,
+            "item_id": item_id,
+            "created_at": now,
+            "last_message": None,
+        }
+        db.collection("chats").document(room_id).set(room_data)
+
+        if initial_message and sender_id:
+            msg_id = str(uuid4())
+            message_data = {
+                "sender_id": sender_id,
+                "text": initial_message,
+                "sent_at": now,
+                "read": False,
+            }
+            db.collection("chats").document(room_id).collection("messages").document(msg_id).set(message_data)
+            db.collection("chats").document(room_id).update({
+                "last_message": {"text": initial_message[:100], "sender_id": sender_id, "sent_at": now}
+            })
+
+        return {
+            "id": room_id,
+            "participants": participants,
+            "item_id": item_id,
+            "last_message": {
+                "text": initial_message[:100] if initial_message else "",
+                "sender_id": sender_id or "",
+                "sent_at": "",
+            } if initial_message else None,
+            "created_at": "",
+        }
+
+    async def get_room(self, room_id: str) -> Optional[Dict[str, Any]]:
+        """Get a single chat room by ID."""
+        db = self._get_db()
+        doc = db.collection("chats").document(room_id).get()
+        if not doc.exists:
+            return None
+        data = doc.to_dict()
+        data["id"] = doc.id
+        lm = data.get("last_message")
+        if lm and hasattr(lm.get("sent_at"), "isoformat"):
+            lm["sent_at"] = lm["sent_at"].isoformat()
+        return data
+
 
 def firestore_timestamp():
     """Get current timestamp in Firestore-compatible format."""

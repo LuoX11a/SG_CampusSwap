@@ -102,7 +102,7 @@ async def update_profile(
     active_count = (await db.execute(count_q)).scalar() or 0
 
     return {
-        "id": current_user.id,
+        "id": str(current_user.id),
         "username": current_user.username,
         "university": current_user.university,
         "campus": current_user.campus,
@@ -147,7 +147,7 @@ async def get_my_listings(
     return {
         "items": [
             {
-                "id": item.id,
+                "id": str(item.id),
                 "title": item.title,
                 "price": item.price,
                 "status": item.status.value if hasattr(item.status, 'value') else str(item.status),
@@ -192,7 +192,7 @@ async def get_user_listings(
     return {
         "items": [
             {
-                "id": item.id,
+                "id": str(item.id),
                 "title": item.title,
                 "price": item.price,
                 "category": (

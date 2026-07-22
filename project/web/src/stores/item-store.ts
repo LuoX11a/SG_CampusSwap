@@ -1,5 +1,5 @@
 /**
- * Item Store â€?Zustand
+ * Item Store ï¿½?Zustand
  *
  * Manages item listing data:
  * - Item list with pagination
@@ -113,7 +113,17 @@ export const useItemStore = create<ItemState>((set, get) => ({
   },
 
   updateItem: async (id: string, data: Partial<ItemCreate>) => {
-    await apiClient.put(`/items/${id}`, data);
+    const payload: Record<string, any> = {};
+    if (data.title !== undefined) payload.title = data.title;
+    if (data.description !== undefined) payload.description = data.description;
+    if (data.category !== undefined) payload.category = data.category;
+    if (data.price !== undefined) payload.price = data.price;
+    if (data.condition !== undefined) payload.condition = data.condition;
+    if (data.courseCode !== undefined) payload.course_code = data.courseCode;
+    if (data.campusLocation !== undefined) payload.campus_location = data.campusLocation;
+    if (data.meetupPoint !== undefined) payload.meetup_point = data.meetupPoint;
+    if (data.imageUrls !== undefined) payload.image_urls = data.imageUrls;
+    await apiClient.put(`/items/${id}`, payload);
     get().fetchItem(id);
   },
 

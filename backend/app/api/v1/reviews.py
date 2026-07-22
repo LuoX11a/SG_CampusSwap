@@ -114,7 +114,7 @@ async def create_review(
     if current_user.id not in [transaction.buyer_id, transaction.seller_id]:
         raise HTTPException(status_code=403, detail="You are not part of this transaction")
 
-    if current_user.id == data.reviewee_id:
+    if str(current_user.id) == data.reviewee_id:
         raise HTTPException(status_code=400, detail="You cannot review yourself")
 
     result = await db.execute(
