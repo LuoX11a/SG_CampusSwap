@@ -13,7 +13,7 @@ const CATEGORIES = [
   { key: 'textbook', label: 'Textbooks' },
   { key: 'electronics', label: 'Electronics' },
   { key: 'furniture', label: 'Furniture' },
-  { key: 'daily_essentials', label: 'Daily' },
+  { key: 'daily', label: 'Daily' },
   { key: 'other', label: 'Other' },
 ];
 

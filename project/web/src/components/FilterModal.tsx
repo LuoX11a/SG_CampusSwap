@@ -10,7 +10,7 @@ const CATEGORIES: { value: ItemCategory; label: string }[] = [
   { value: 'textbook', label: '📚 Textbook' },
   { value: 'electronics', label: '💻 Electronics' },
   { value: 'furniture', label: '🪑 Furniture' },
-  { value: 'daily_essentials', label: '🧴 Daily' },
+  { value: 'daily', label: '🧴 Daily' },
   { value: 'other', label: '📦 Other' },
 ];
 

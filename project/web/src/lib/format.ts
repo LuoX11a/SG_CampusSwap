@@ -14,7 +14,7 @@ export function formatCategory(cat: string): string {
     textbook: '📚 Textbook',
     electronics: '💻 Electronics',
     furniture: '🪑 Furniture',
-    daily_essentials: '🧴 Daily Essentials',
+    daily: '🧴 Daily Essentials',
     other: '📦 Other',
   };
   return map[cat] || cat;

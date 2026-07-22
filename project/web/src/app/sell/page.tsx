@@ -13,7 +13,7 @@ const CATEGORIES: { value: ItemCategory; label: string }[] = [
   { value: 'textbook', label: '📚 Textbook' },
   { value: 'electronics', label: '💻 Electronics' },
   { value: 'furniture', label: '🪑 Furniture' },
-  { value: 'daily_essentials', label: '🧴 Daily Essentials' },
+  { value: 'daily', label: '🧴 Daily Essentials' },
   { value: 'other', label: '📦 Other' },
 ];
 
@@ -192,7 +192,7 @@ export default function CreateListingPage() {
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
           <textarea value={description} onChange={(e) => setDescription(e.target.value)}
-            placeholder="Describe your item �?condition, usage history, reason for selling..." rows={5} maxLength={2000}
+            placeholder="Describe your item �?condition, usage history, reason for selling..." rows={5} maxLength={2000}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none" />
           <p className="text-xs text-gray-400 mt-1">{description.length}/2000</p>
         </div>

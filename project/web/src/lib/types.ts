@@ -51,7 +51,7 @@ export enum ItemCategory {
   TEXTBOOK = 'textbook',
   ELECTRONICS = 'electronics',
   FURNITURE = 'furniture',
-  DAILY_ESSENTIALS = 'daily_essentials',
+  DAILY_ESSENTIALS = 'daily',
   OTHER = 'other',
 }
 
