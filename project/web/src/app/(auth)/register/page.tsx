@@ -33,7 +33,8 @@ export default function RegisterPage() {
     try {
       const result = await register({ username, email, university, campus, password, confirm_password: confirmPassword });
       if (result?.email) {
-        router.push(`/verify-email?email=${encodeURIComponent(result.email)}`);
+        // In DEBUG mode, user is auto-verified — go straight to login
+        router.push('/login?registered=true');
       }
     } catch (err: any) {
       // Error handled by store — but log for debugging
