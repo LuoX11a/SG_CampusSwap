@@ -35,15 +35,25 @@ class Settings(BaseSettings):
 
     # ── University Email Domain Whitelist ─────────────────
     ALLOWED_EMAIL_DOMAINS: str = (
+        # Singapore public universities
         "u.nus.edu,nus.edu.sg,nus.edu,"
         "e.ntu.edu.sg,ntu.edu.sg,"
-        "smu.edu.sg,sutd.edu.sg,suss.edu.sg,sit.edu.sg,"
-        "mymail.sim.edu.sg,sim.edu.sg,"
+        "smu.edu.sg,sutd.edu.sg,suss.edu.sg,sit.edu.sg,singaporetech.edu.sg,"
+        # Singapore polytechnics
         "connect.np.edu.sg,np.edu.sg,"
         "ichat.sp.edu.sg,sp.edu.sg,"
         "tp.edu.sg,nyp.edu.sg,rp.edu.sg,"
+        # Singapore arts institutions
         "lasalle.edu.sg,nafa.edu.sg,"
-        "jcu.edu.sg,my.jcu.edu.au"
+        # Singapore private institutions
+        "mymail.sim.edu.sg,sim.edu.sg,"
+        "kaplan.edu.sg,psb-academy.edu.sg,curtin.edu.sg,mdis.edu.sg,raffles.edu.sg,"
+        "jcu.edu.sg,my.jcu.edu.au,"
+        # International universities with Singapore campuses
+        "insead.edu,digipen.edu,essec.edu,"
+        "amity.edu,s.amity.edu,"
+        "coventry.ac.uk,gla.ac.uk,"
+        "tum.de,tum-asia.edu.sg"
     )
 
     # ── Email Verification ────────────────────────────────
