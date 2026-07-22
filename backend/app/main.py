@@ -91,12 +91,26 @@ async def health():
 
 
 # ── Router Registration ──
-from app.api.v1 import auth, items, users, upload, reviews, search, chat
+# Each router is imported individually — if one fails, others still load.
+import importlib
+import logging
+import traceback
 
-app.include_router(auth.router, prefix=f"{settings.API_V1_PREFIX}/auth", tags=["auth"])
-app.include_router(items.router, prefix=f"{settings.API_V1_PREFIX}/items", tags=["items"])
-app.include_router(users.router, prefix=f"{settings.API_V1_PREFIX}/users", tags=["users"])
-app.include_router(upload.router, prefix=f"{settings.API_V1_PREFIX}/upload", tags=["upload"])
-app.include_router(reviews.router, prefix=f"{settings.API_V1_PREFIX}/reviews", tags=["reviews"])
-app.include_router(search.router, prefix=f"{settings.API_V1_PREFIX}/search", tags=["search"])
-app.include_router(chat.router, prefix=f"{settings.API_V1_PREFIX}/chat", tags=["chat"])
+_logger = logging.getLogger("uvicorn")
+ROUTER_NAMES = ["auth", "items", "users", "upload", "reviews", "search", "chat"]
+
+router_failures = []
+for name in ROUTER_NAMES:
+    try:
+        mod = importlib.import_module(f"app.api.v1.{name}")
+        app.include_router(mod.router, prefix=f"{settings.API_V1_PREFIX}/{name}", tags=[name])
+        _logger.info(f"✅ router loaded: {name}")
+    except Exception as exc:
+        router_failures.append(name)
+        _logger.error(f"❌ router {name} FAILED: {type(exc).__name__}: {exc}")
+        _logger.error(traceback.format_exc())
+
+if router_failures:
+    _logger.warning(f"Failed routers: {router_failures}")
+else:
+    _logger.info("All routers loaded successfully")
