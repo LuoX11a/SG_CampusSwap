@@ -31,7 +31,7 @@ export default function RegisterPage() {
       return;
     }
     try {
-      const result = await register({ username, email, university, campus, password, confirmPassword });
+      const result = await register({ username, email, university, campus, password, confirm_password: confirmPassword });
       if (result?.email) {
         router.push(`/verify-email?email=${encodeURIComponent(result.email)}`);
       }

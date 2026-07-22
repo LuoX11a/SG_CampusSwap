@@ -36,7 +36,7 @@ export interface RegisterRequest {
   university: string;
   campus: string;
   password: string;
-  confirmPassword: string;
+  confirm_password: string;
 }
 
 export interface TokenResponse {
