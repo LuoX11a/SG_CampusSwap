@@ -2,33 +2,50 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useItemStore } from '@/stores/item-store';
 import { useAuthStore } from '@/stores/auth-store';
+import apiClient from '@/lib/api-client';
 import { formatPriceDisplay } from '@/lib/format';
 import clsx from 'clsx';
+import type { Item } from '@/lib/types';
+
+interface ListingItem {
+  id: string; title: string; price: number; status: string;
+  primary_image: string | null; created_at: string; view_count: number;
+}
 
 export default function MyListingsPage() {
   const { user } = useAuthStore();
-  const { items, fetchItems, deleteItem, markStatus } = useItemStore();
+  const [listings, setListings] = useState<ListingItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'active' | 'sold'>('active');
 
-  useEffect(() => {
-    fetchItems({ sort: 'newest' });
-  }, []);
+  const fetchMyListings = () => {
+    setIsLoading(true);
+    setError(null);
+    apiClient.get('/users/me/listings', { params: { page_size: 50 } })
+      .then(res => setListings(res.data.items || []))
+      .catch(() => setError('Failed to load your listings.'))
+      .finally(() => setIsLoading(false));
+  };
 
-  const myItems = items.filter((i) => i.seller?.id === user?.id);
+  useEffect(() => { fetchMyListings(); }, []);
+  useEffect(() => { fetchMyListings(); }, [activeTab]);
+
   const filtered = activeTab === 'active'
-    ? myItems.filter((i) => i.status === 'available' || i.status === 'reserved')
-    : myItems.filter((i) => i.status === 'sold');
+    ? listings.filter((i) => i.status === 'available' || i.status === 'reserved')
+    : listings.filter((i) => i.status === 'sold');
 
   const handleDelete = async (id: string) => {
     if (confirm('Delete this listing?')) {
-      await deleteItem(id);
+      await apiClient.delete(`/items/${id}`);
+      setListings(prev => prev.filter(i => i.id !== id));
     }
   };
 
   const handleMarkSold = async (id: string) => {
-    await markStatus(id, 'sold');
+    await apiClient.patch(`/items/${id}/status`, null, { params: { new_status: 'sold' } });
+    setListings(prev => prev.map(i => i.id === id ? { ...i, status: 'sold' } : i));
   };
 
   return (
@@ -46,7 +63,20 @@ export default function MyListingsPage() {
         ))}
       </div>
 
-      {filtered.length === 0 ? (
+      {isLoading ? (
+        <div className="space-y-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="bg-white rounded-lg border border-gray-200 p-4 animate-pulse">
+              <div className="flex gap-4"><div className="w-32 h-24 bg-gray-200 rounded" /><div className="flex-1 space-y-2"><div className="h-4 bg-gray-200 rounded w-2/3" /><div className="h-5 bg-gray-100 rounded w-1/3" /></div></div>
+            </div>
+          ))}
+        </div>
+      ) : error ? (
+        <div className="text-center py-20">
+          <div className="text-5xl mb-4">⚠️</div><p className="text-gray-500">{error}</p>
+          <button onClick={fetchMyListings} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg text-sm">Retry</button>
+        </div>
+      ) : filtered.length === 0 ? (
         <div className="text-center py-20 bg-white rounded-lg border border-gray-200">
           <div className="text-6xl mb-4">📦</div>
           <h2 className="text-xl font-semibold text-gray-900 mb-2">
@@ -66,8 +96,8 @@ export default function MyListingsPage() {
           {filtered.map((item) => (
             <div key={item.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
               <div className="h-44 bg-gray-100 flex items-center justify-center relative">
-                {item.primaryImage ? (
-                  <img src={item.primaryImage} alt={item.title} className="w-full h-full object-cover" />
+                {item.primary_image ? (
+                  <img src={item.primary_image} alt={item.title} className="w-full h-full object-cover" loading="lazy" />
                 ) : (
                   <span className="text-gray-400 text-3xl">📦</span>
                 )}

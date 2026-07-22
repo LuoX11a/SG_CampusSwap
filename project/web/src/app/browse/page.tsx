@@ -22,16 +22,21 @@ function BrowseContent() {
   const [results, setResults] = useState<Item[]>([]);
   const [total, setTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!query) return;
     setIsLoading(true);
+    setError(null);
     apiClient.get('/search', { params: { q: query, page_size: 24 } })
       .then((res) => {
         setResults(res.data.results.map(mapSearchItem));
         setTotal(res.data.total);
       })
-      .catch(() => setResults([]))
+      .catch((err) => {
+        setError(err.response?.data?.detail || 'Search failed. Please try again.');
+        setResults([]);
+      })
       .finally(() => setIsLoading(false));
   }, [query]);
 
@@ -46,7 +51,14 @@ function BrowseContent() {
       </h1>
       <p className="text-gray-500 mb-6">{total} items found</p>
 
-      {isLoading ? (
+      {error ? (
+        <div className="text-center py-20">
+          <div className="text-5xl mb-4">⚠️</div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Search failed</h2>
+          <p className="text-gray-500 mb-4">{error}</p>
+          <button onClick={() => window.location.reload()} className="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600">Retry</button>
+        </div>
+      ) : isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)}
         </div>
