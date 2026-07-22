@@ -71,7 +71,8 @@ async def root():
         "version": settings.APP_VERSION,
         "status": "running",
         "env": settings.ENVIRONMENT,
-        "routers": [name for name, _ in router_modules],
+        "loaded": [name for name in ROUTER_NAMES if name not in router_failures],
+        "failed": router_failures,
     }
 
 
