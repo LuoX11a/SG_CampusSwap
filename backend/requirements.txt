@@ -8,14 +8,16 @@ pydantic==2.10.3
 pydantic-settings==2.7.0
 
 # Database
-sqlalchemy[asyncio]==2.0.36
+sqlalchemy==2.0.36
 asyncpg==0.30.0
+greenlet==3.1.1
 alembic==1.14.0
 psycopg2-binary==2.9.10
 
 # Auth
-python-jose[cryptography]==3.3.0
-passlib[bcrypt]==1.7.4
+python-jose==3.3.0
+cryptography==44.0.0
+passlib==1.7.4
 bcrypt==4.0.1
 python-multipart==0.0.18
 
@@ -23,8 +25,8 @@ python-multipart==0.0.18
 sendgrid==6.11.0
 
 # External Services
-firebase-admin==6.5.0
-cloudinary==1.41.0
+# firebase-admin==6.5.0  # uncomment when Firebase credentials configured
+# cloudinary==1.41.0     # uncomment when Cloudinary account configured
 
 # HTTP
 httpx==0.28.1
@@ -33,4 +35,3 @@ aiofiles==24.1.0
 # Dev & Testing
 pytest==8.3.4
 pytest-asyncio==0.24.0
-factory-boy==3.3.1
