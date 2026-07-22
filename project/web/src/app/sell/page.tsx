@@ -7,9 +7,8 @@ import { useItemStore } from '@/stores/item-store';
 import { useAuthStore } from '@/stores/auth-store';
 import apiClient from '@/lib/api-client';
 import toast from 'react-hot-toast';
-import type { ItemCategory, ItemCondition } from '@/lib/types';
 
-const CATEGORIES: { value: ItemCategory; label: string }[] = [
+const CATEGORIES: { value: string; label: string }[] = [
   { value: 'textbook', label: '📚 Textbook' },
   { value: 'electronics', label: '💻 Electronics' },
   { value: 'furniture', label: '🪑 Furniture' },
@@ -17,7 +16,7 @@ const CATEGORIES: { value: ItemCategory; label: string }[] = [
   { value: 'other', label: '📦 Other' },
 ];
 
-const CONDITIONS: { value: ItemCondition; label: string }[] = [
+const CONDITIONS: { value: string; label: string }[] = [
   { value: 'like_new', label: 'Like New' },
   { value: 'good', label: 'Good' },
   { value: 'fair', label: 'Fair' },
@@ -31,8 +30,8 @@ export default function CreateListingPage() {
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [category, setCategory] = useState<ItemCategory>('other');
-  const [condition, setCondition] = useState<ItemCondition>('good');
+  const [category, setCategory] = useState<string>('other');
+  const [condition, setCondition] = useState<string>('good');
   const [priceDollars, setPriceDollars] = useState('');
   const [courseCode, setCourseCode] = useState('');
   const [campusLocation, setCampusLocation] = useState(user?.campus || '');
@@ -139,14 +138,14 @@ export default function CreateListingPage() {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-            <select value={category} onChange={(e) => setCategory(e.target.value as ItemCategory)}
+            <select value={category} onChange={(e) => setCategory(e.target.value)}
               className="w-full h-11 px-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white">
               {CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
             </select>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Condition</label>
-            <select value={condition} onChange={(e) => setCondition(e.target.value as ItemCondition)}
+            <select value={condition} onChange={(e) => setCondition(e.target.value)}
               className="w-full h-11 px-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white">
               {CONDITIONS.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
             </select>

@@ -44,7 +44,7 @@ export default function ProfilePage() {
         <p className="text-sm text-gray-400 mt-0.5">{user.university} · {user.campus}</p>
         <div className="mt-3 flex items-center justify-center gap-1 text-amber-500">
           <Star size={18} className="fill-amber-400" />
-          <span className="font-semibold">{user.ratingAvg?.toFixed(1) || '�?}</span>
+          <span className="font-semibold">{user.ratingAvg?.toFixed(1) || '—'}</span>
           <span className="text-gray-400 text-sm">({user.ratingCount} reviews)</span>
         </div>
       </div>

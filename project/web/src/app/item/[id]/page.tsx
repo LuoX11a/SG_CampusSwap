@@ -59,7 +59,7 @@ export default function ItemDetailPage() {
         {/* Info */}
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{item.title}</h1>
-          <p className="text-3xl font-bold text-amber-500 mt-3">{formatPriceDisplay(item.priceCents)}</p>
+          <p className="text-3xl font-bold text-amber-500 mt-3">{formatPriceDisplay(item.price)}</p>
 
           <div className="flex gap-2 mt-3">
             <span className="px-3 py-1 rounded-full text-sm font-medium bg-blue-50 text-blue-700">{formatCategory(item.category)}</span>

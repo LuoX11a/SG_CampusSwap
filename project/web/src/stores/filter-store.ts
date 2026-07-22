@@ -1,10 +1,10 @@
 import { create } from 'zustand';
-import type { ItemFilters, ItemCategory, ItemCondition } from '@/lib/types';
+import type { ItemFilters } from '@/lib/types';
 
 interface FilterState {
   filters: ItemFilters;
-  setCategory: (category?: ItemCategory) => void;
-  setCondition: (condition?: ItemCondition) => void;
+  setCategory: (category?: string) => void;
+  setCondition: (condition?: string) => void;
   setCampus: (campus?: string) => void;
   setPriceRange: (min?: number, max?: number) => void;
   setSort: (sort: ItemFilters['sort']) => void;

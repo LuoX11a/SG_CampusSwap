@@ -100,9 +100,9 @@ export interface Item {
 export interface ItemCreate {
   title: string;
   description: string;
-  category: ItemCategory;
+  category: string;
   price: number;
-  condition: ItemCondition;
+  condition: string;
   courseCode?: string;
   campusLocation: string;
   meetupPoint: string;
@@ -110,8 +110,8 @@ export interface ItemCreate {
 }
 
 export interface ItemFilters {
-  category?: ItemCategory;
-  condition?: ItemCondition;
+  category?: string;
+  condition?: string;
   campus?: string;
   minPrice?: number;
   maxPrice?: number;

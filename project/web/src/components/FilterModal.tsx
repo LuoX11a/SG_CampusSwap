@@ -3,10 +3,9 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
 import { useFilterStore } from '@/stores/filter-store';
-import type { ItemCategory, ItemCondition } from '@/lib/types';
 import clsx from 'clsx';
 
-const CATEGORIES: { value: ItemCategory; label: string }[] = [
+const CATEGORIES: { value: string; label: string }[] = [
   { value: 'textbook', label: '📚 Textbook' },
   { value: 'electronics', label: '💻 Electronics' },
   { value: 'furniture', label: '🪑 Furniture' },
@@ -14,7 +13,7 @@ const CATEGORIES: { value: ItemCategory; label: string }[] = [
   { value: 'other', label: '📦 Other' },
 ];
 
-const CONDITIONS: { value: ItemCondition; label: string }[] = [
+const CONDITIONS: { value: string; label: string }[] = [
   { value: 'like_new', label: 'Like New' },
   { value: 'good', label: 'Good' },
   { value: 'fair', label: 'Fair' },
