@@ -92,12 +92,18 @@ async def health():
 
 
 # ── Router Registration ──
-from app.api.v1 import auth, items, users, upload, reviews, search, chat
+import logging
+_logger = logging.getLogger("uvicorn")
 
-app.include_router(auth.router, prefix=f"{settings.API_V1_PREFIX}/auth", tags=["auth"])
-app.include_router(items.router, prefix=f"{settings.API_V1_PREFIX}/items", tags=["items"])
-app.include_router(users.router, prefix=f"{settings.API_V1_PREFIX}/users", tags=["users"])
-app.include_router(upload.router, prefix=f"{settings.API_V1_PREFIX}/upload", tags=["upload"])
-app.include_router(reviews.router, prefix=f"{settings.API_V1_PREFIX}/reviews", tags=["reviews"])
-app.include_router(search.router, prefix=f"{settings.API_V1_PREFIX}/search", tags=["search"])
-app.include_router(chat.router, prefix=f"{settings.API_V1_PREFIX}/chat", tags=["chat"])
+# Try each router import individually to identify the failing one
+router_modules = []
+for name in ["auth", "items", "users", "upload", "reviews", "search", "chat"]:
+    try:
+        mod = __import__(f"app.api.v1.{name}", fromlist=[name])
+        router_modules.append((name, mod.router))
+        _logger.info(f"  ✅ {name} router loaded")
+    except Exception as exc:
+        _logger.error(f"  ❌ {name} router FAILED: {exc}")
+
+for name, router in router_modules:
+    app.include_router(router, prefix=f"{settings.API_V1_PREFIX}/{name}", tags=[name])
