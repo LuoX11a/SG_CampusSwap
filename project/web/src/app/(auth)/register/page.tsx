@@ -32,9 +32,12 @@ export default function RegisterPage() {
     }
     try {
       const result = await register({ username, email, university, campus, password, confirmPassword });
-      router.push(`/verify-email?email=${encodeURIComponent(result.email)}`);
-    } catch {
-      // Error handled by store
+      if (result?.email) {
+        router.push(`/verify-email?email=${encodeURIComponent(result.email)}`);
+      }
+    } catch (err: any) {
+      // Error handled by store — but log for debugging
+      console.error('Register error:', err?.response?.data || err);
     }
   };
 
