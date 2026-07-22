@@ -38,7 +38,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </div>
 
           {/* Main content — full width on mobile, offset on desktop */}
-          <main className="flex-1 md:ml-[240px] pb-nav md:pb-6 p-3 md:p-6 bg-[#F3F4F6] min-h-screen">
+          <main className="flex-1 md:ml-[240px] pb-nav md:pb-6 p-3 md:p-6 bg-[#F3F4F6] min-h-screen overflow-x-hidden">
             {children}
           </main>
         </div>
