@@ -1,5 +1,5 @@
 # SG CampusSwap - CI/CD Pipeline
-# GitHub Actions: Lint -> Test (auto-deploy handled by Vercel + Render)
+# GitHub Actions: Lint -> Test (Vercel + Render handle auto-deploy)
 
 name: CI/CD
 
@@ -73,7 +73,7 @@ jobs:
         env:
           DATABASE_URL: postgresql+asyncpg://postgres:testpass@localhost:5432/sg_campusswap_test
           JWT_SECRET: test-secret-key-ci-only
-          DEBUG: true
+          DEBUG: "true"
         run: |
           cd backend
-          pytest tests/ -v --cov=app --cov-report=term-missing --ignore=tests/test_search.py --ignore=tests/test_chat.py || true
+          pytest tests/ -v --cov=app --cov-report=term-missing --tb=short 2>&1 | tail -80
