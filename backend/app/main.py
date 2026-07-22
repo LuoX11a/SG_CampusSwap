@@ -16,26 +16,24 @@ from app.config import settings
 async def lifespan(app: FastAPI):
     """Startup / shutdown lifecycle — pre-warms the database engine."""
     import logging
-    from sqlalchemy import text
-
     logger = logging.getLogger("uvicorn")
-    logger.info(f"Starting {settings.APP_NAME} v{settings.APP_VERSION}")
-    logger.info(f"Environment: {settings.ENVIRONMENT}")
-    logger.info(f"CORS origins: {settings.CORS_ORIGINS}")
 
-    # Pre-warm the database engine so the first health check doesn't time out
     try:
+        logger.info(f"Starting {settings.APP_NAME} v{settings.APP_VERSION}")
+        logger.info(f"Environment: {settings.ENVIRONMENT}")
+        logger.info(f"CORS origins: {settings.CORS_ORIGINS}")
+
+        from sqlalchemy import text
         from app.database import get_engine
         engine = get_engine()
         async with engine.begin() as conn:
             await conn.execute(text("SELECT 1"))
         logger.info("Database engine warmed up and connected")
     except Exception as exc:
-        logger.error(f"Database warm-up failed: {exc}")
-        # Don't crash — the health check will report unhealthy status
+        logger.error(f"Lifespan startup error: {type(exc).__name__}: {exc}")
 
     yield
-    # Cleanup: dispose engine on shutdown
+
     try:
         from app.database import get_engine
         engine = get_engine()
@@ -73,6 +71,7 @@ async def root():
         "version": settings.APP_VERSION,
         "status": "running",
         "env": settings.ENVIRONMENT,
+        "routers": [name for name, _ in router_modules],
     }
 
 
