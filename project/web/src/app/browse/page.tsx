@@ -1,8 +1,6 @@
 'use client';
 
-export const dynamic = 'force-dynamic';
-
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import apiClient from '@/lib/api-client';
 import ItemCard from '@/components/ItemCard';
@@ -11,6 +9,14 @@ import SkeletonCard from '@/components/SkeletonCard';
 import type { Item } from '@/lib/types';
 
 export default function BrowsePage() {
+  return (
+    <Suspense fallback={<div className="p-4">Loading...</div>}>
+      <BrowseContent />
+    </Suspense>
+  );
+}
+
+function BrowseContent() {
   const searchParams = useSearchParams();
   const query = searchParams.get('q') || '';
   const [results, setResults] = useState<Item[]>([]);

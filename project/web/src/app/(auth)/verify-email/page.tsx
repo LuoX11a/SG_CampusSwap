@@ -1,13 +1,19 @@
 'use client';
 
-export const dynamic = 'force-dynamic';
-
-import { useState, useRef, useEffect, KeyboardEvent, ClipboardEvent } from 'react';
+import { useState, useRef, useEffect, KeyboardEvent, ClipboardEvent, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/stores/auth-store';
 import toast from 'react-hot-toast';
 
 export default function VerifyEmailPage() {
+  return (
+    <Suspense fallback={<div className="p-4">Loading...</div>}>
+      <VerifyContent />
+    </Suspense>
+  );
+}
+
+function VerifyContent() {
   const searchParams = useSearchParams();
   const email = searchParams.get('email') || '';
   const [code, setCode] = useState(['', '', '', '', '', '']);
