@@ -8,7 +8,7 @@ from typing import Optional, List
 
 from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel
-from sqlalchemy import select, func, and_, or_
+from sqlalchemy import select, func, and_, or_, case
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -106,14 +106,31 @@ async def search_items(
     count_q = select(func.count(Item.id)).where(and_(*conditions))
     total = (await db.execute(count_q)).scalar() or 0
 
-    sort_map = {
-        "relevance": Item.created_at.desc(),
-        "newest": Item.created_at.desc(),
-        "price_asc": Item.price.asc(),
-        "price_desc": Item.price.desc(),
-        "popular": Item.view_count.desc(),
-    }
-    order_by = sort_map.get(sort, Item.created_at.desc())
+    # Relevance sort: prioritize exact title matches, then other matches
+    if sort == "relevance" and q:
+        relevance_expr = func.greatest(
+            case(
+                (Item.title.ilike(f"%{q}%"), 3),
+                else_=0,
+            ),
+            case(
+                (Item.description.ilike(f"%{q}%"), 2),
+                else_=0,
+            ),
+            case(
+                (Item.course_code.ilike(f"%{q}%"), 1),
+                else_=0,
+            ),
+        )
+        order_by = relevance_expr.desc()
+    else:
+        sort_map = {
+            "newest": Item.created_at.desc(),
+            "price_asc": Item.price.asc(),
+            "price_desc": Item.price.desc(),
+            "popular": Item.view_count.desc(),
+        }
+        order_by = sort_map.get(sort, Item.created_at.desc())
 
     search_term = q
 
