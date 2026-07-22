@@ -56,11 +56,12 @@ export default function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 space-y-1">
+      <nav className="flex-1 px-3 py-4 space-y-1" aria-label="Main navigation">
         {NAV_ITEMS.map((item) => (
           <Link
             key={item.href}
             href={item.href}
+            aria-current={isActive(item.href) ? 'page' : undefined}
             className={clsx(
               'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors duration-150',
               isActive(item.href)

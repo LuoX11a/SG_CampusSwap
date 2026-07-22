@@ -25,6 +25,7 @@ export default function MobileBottomNav() {
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 flex items-center justify-around"
       style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)', height: '64px' }}
+      aria-label="Mobile navigation"
     >
       {TABS.map((tab) => {
         const isActive =
@@ -36,6 +37,7 @@ export default function MobileBottomNav() {
           <Link
             key={tab.href}
             href={tab.href}
+            aria-current={isActive ? 'page' : undefined}
             className={clsx(
               'flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors',
               isActive
