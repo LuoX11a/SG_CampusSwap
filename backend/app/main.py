@@ -115,3 +115,16 @@ if router_failures:
     _logger.warning(f"Failed routers: {router_failures}")
 else:
     _logger.info("All routers loaded successfully")
+
+@app.get("/debug/routers")
+async def debug_routers():
+    """Return detailed router import errors for debugging."""
+    import traceback as tb
+    results = {}
+    for name in ROUTER_NAMES:
+        try:
+            importlib.import_module(f"app.api.v1.{name}")
+            results[name] = "OK"
+        except Exception as exc:
+            results[name] = f"{type(exc).__name__}: {exc}"
+    return results
