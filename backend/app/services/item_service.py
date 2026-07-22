@@ -8,7 +8,7 @@ Handles complex item operations beyond basic CRUD:
 - Listing status transitions
 """
 
-from typing import Optional, List, Dict, Any
+from typing import List, Dict, Any
 from app.models.item import Item, ItemStatus, ItemCategory, ItemCondition
 
 
@@ -51,7 +51,7 @@ def get_status_color(status: ItemStatus) -> str:
     color_map = {
         ItemStatus.available: "#10B981",  # Green
         ItemStatus.reserved: "#F59E0B",  # Amber
-        ItemStatus.sold: "#6B7280",       # Gray
+        ItemStatus.sold: "#6B7280",  # Gray
     }
     return color_map.get(status, "#6B7280")
 

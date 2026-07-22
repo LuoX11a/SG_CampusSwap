@@ -148,36 +148,32 @@ async def search_items(
     results = []
     for item in items:
         primary = (
-            next((img.url for img in item.images if img.is_primary), None)
-            if item.images
-            else None
+            next((img.url for img in item.images if img.is_primary), None) if item.images else None
         )
-        results.append({
-            "id": str(item.id),
-            "title": item.title,
-            "price": item.price,
-            "category": (
-                item.category.value
-                if hasattr(item.category, 'value')
-                else str(item.category)
-            ),
-            "condition": (
-                item.condition.value
-                if hasattr(item.condition, 'value')
-                else str(item.condition)
-            ),
-            "campus_location": item.campus_location,
-            "status": (
-                item.status.value
-                if hasattr(item.status, 'value')
-                else str(item.status)
-            ),
-            "created_at": item.created_at.isoformat() if item.created_at else "",
-            "seller_name": item.seller.username if item.seller else "Unknown",
-            "seller_rating": item.seller.rating_avg if item.seller else None,
-            "primary_image": primary,
-            "relevance": 1.0,
-        })
+        results.append(
+            {
+                "id": str(item.id),
+                "title": item.title,
+                "price": item.price,
+                "category": (
+                    item.category.value if hasattr(item.category, "value") else str(item.category)
+                ),
+                "condition": (
+                    item.condition.value
+                    if hasattr(item.condition, "value")
+                    else str(item.condition)
+                ),
+                "campus_location": item.campus_location,
+                "status": (
+                    item.status.value if hasattr(item.status, "value") else str(item.status)
+                ),
+                "created_at": item.created_at.isoformat() if item.created_at else "",
+                "seller_name": item.seller.username if item.seller else "Unknown",
+                "seller_rating": item.seller.rating_avg if item.seller else None,
+                "primary_image": primary,
+                "relevance": 1.0,
+            }
+        )
 
     return {
         "results": results,

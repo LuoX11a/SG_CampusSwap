@@ -140,7 +140,8 @@ async def register_user(
     verification = EmailVerification(
         email=email,
         code=code,
-        expires_at=datetime.now(timezone.utc) + timedelta(minutes=settings.VERIFICATION_CODE_EXPIRE_MINUTES),
+        expires_at=datetime.now(timezone.utc)
+        + timedelta(minutes=settings.VERIFICATION_CODE_EXPIRE_MINUTES),
     )
     db.add(verification)
     await send_verification_email(email, code)

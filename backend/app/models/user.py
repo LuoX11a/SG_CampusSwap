@@ -25,7 +25,9 @@ class User(Base):
     is_verified: Mapped[bool] = mapped_column(Boolean, default=False)
     rating_avg: Mapped[float] = mapped_column(Float, default=0.0)
     rating_count: Mapped[int] = mapped_column(default=0)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False
+    )
 
     # Relationships
     items = relationship("Item", back_populates="seller")
