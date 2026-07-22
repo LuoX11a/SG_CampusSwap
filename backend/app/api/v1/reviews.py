@@ -7,7 +7,7 @@ GET    /api/v1/reviews/me                   — Get my reviews
 GET    /api/v1/reviews/rating-summary/{user_id} — Rating distribution
 """
 
-from typing import Optional, List
+from typing import List
 from uuid import uuid4
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -25,6 +25,7 @@ router = APIRouter()
 
 
 # ─── Schemas ───────────────────────────────────────────────────
+
 
 class ReviewCreate(BaseModel):
     reviewee_id: str
@@ -53,6 +54,7 @@ class RatingSummary(BaseModel):
 
 
 # ─── Routes ────────────────────────────────────────────────────
+
 
 @router.get("/user/{user_id}", response_model=List[ReviewResponse])
 async def get_user_reviews(

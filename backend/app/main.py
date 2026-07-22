@@ -16,6 +16,7 @@ from app.config import settings
 async def lifespan(app: FastAPI):
     """Startup / shutdown lifecycle — pre-warms the database engine."""
     import logging
+
     logger = logging.getLogger("uvicorn")
 
     try:
@@ -25,6 +26,7 @@ async def lifespan(app: FastAPI):
 
         from sqlalchemy import text
         from app.database import get_engine
+
         engine = get_engine()
         async with engine.begin() as conn:
             await conn.execute(text("SELECT 1"))
@@ -36,6 +38,7 @@ async def lifespan(app: FastAPI):
 
     try:
         from app.database import get_engine
+
         engine = get_engine()
         await engine.dispose()
         logger.info("Database engine disposed")
@@ -63,6 +66,7 @@ app.add_middleware(
 
 # ── Health Check (used by Render to detect ready state) ──
 
+
 @app.get("/")
 async def root():
     """Public health check."""
@@ -89,11 +93,11 @@ async def health():
         return {"status": "unhealthy", "database": str(e)}
 
 
-# ── Router Registration ──
+# ── Router Registration ──  # noqa: E402
 # Each router is imported individually — if one fails, others still load.
-import importlib
-import logging
-import traceback
+import importlib  # noqa: E402
+import logging  # noqa: E402
+import traceback  # noqa: E402
 
 _logger = logging.getLogger("uvicorn")
 ROUTER_NAMES = ["auth", "items", "users", "upload", "reviews", "search", "chat"]

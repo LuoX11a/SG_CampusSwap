@@ -94,7 +94,9 @@ class ChatService:
             "read": False,
         }
 
-        db.collection("chats").document(chat_id).collection("messages").document(msg_id).set(message_data)
+        db.collection("chats").document(chat_id).collection("messages").document(msg_id).set(
+            message_data
+        )
         db.collection("chats").document(chat_id).update(
             {"last_message": {"text": text[:100], "sender_id": sender_id, "sent_at": now}}
         )
@@ -130,7 +132,9 @@ class ChatService:
 
     async def mark_as_read(self, chat_id: str, message_id: str):
         db = self._get_db()
-        db.collection("chats").document(chat_id).collection("messages").document(message_id).update({"read": True})
+        db.collection("chats").document(chat_id).collection("messages").document(message_id).update(
+            {"read": True}
+        )
 
     async def get_user_chats(self, user_id: str) -> List[Dict[str, Any]]:
         db = self._get_db()
@@ -167,17 +171,23 @@ class ChatService:
         rooms = []
         for chat in chats:
             lm = chat.get("last_message")
-            rooms.append({
-                "id": chat.get("id", ""),
-                "participants": chat.get("participants", []),
-                "item_id": chat.get("item_id"),
-                "last_message": {
-                    "text": lm.get("text", "") if lm else "",
-                    "sender_id": lm.get("sender_id", "") if lm else "",
-                    "sent_at": lm.get("sent_at", "") if lm else "",
-                } if lm else None,
-                "created_at": chat.get("created_at", ""),
-            })
+            rooms.append(
+                {
+                    "id": chat.get("id", ""),
+                    "participants": chat.get("participants", []),
+                    "item_id": chat.get("item_id"),
+                    "last_message": (
+                        {
+                            "text": lm.get("text", "") if lm else "",
+                            "sender_id": lm.get("sender_id", "") if lm else "",
+                            "sent_at": lm.get("sent_at", "") if lm else "",
+                        }
+                        if lm
+                        else None
+                    ),
+                    "created_at": chat.get("created_at", ""),
+                }
+            )
         return rooms
 
     async def create_room(
@@ -211,20 +221,32 @@ class ChatService:
                 "sent_at": now,
                 "read": False,
             }
-            db.collection("chats").document(room_id).collection("messages").document(msg_id).set(message_data)
-            db.collection("chats").document(room_id).update({
-                "last_message": {"text": initial_message[:100], "sender_id": sender_id, "sent_at": now}
-            })
+            db.collection("chats").document(room_id).collection("messages").document(msg_id).set(
+                message_data
+            )
+            db.collection("chats").document(room_id).update(
+                {
+                    "last_message": {
+                        "text": initial_message[:100],
+                        "sender_id": sender_id,
+                        "sent_at": now,
+                    }
+                }
+            )
 
         return {
             "id": room_id,
             "participants": participants,
             "item_id": item_id,
-            "last_message": {
-                "text": initial_message[:100] if initial_message else "",
-                "sender_id": sender_id or "",
-                "sent_at": "",
-            } if initial_message else None,
+            "last_message": (
+                {
+                    "text": initial_message[:100] if initial_message else "",
+                    "sender_id": sender_id or "",
+                    "sent_at": "",
+                }
+                if initial_message
+                else None
+            ),
             "created_at": "",
         }
 
@@ -246,6 +268,7 @@ def firestore_timestamp():
     """Get current timestamp in Firestore-compatible format."""
     try:
         from google.cloud import firestore
+
         return firestore.SERVER_TIMESTAMP
     except ImportError:
         return datetime.now(timezone.utc).isoformat()

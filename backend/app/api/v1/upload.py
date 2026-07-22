@@ -10,9 +10,6 @@ from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from pydantic import BaseModel
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from app.database import get_db
 from app.models.user import User
 from app.api.v1.auth import get_current_user
 from app.services.upload_service import upload_to_cloudinary, delete_from_cloudinary
@@ -50,7 +47,7 @@ async def upload_image(
     if file.content_type not in ALLOWED_TYPES:
         raise HTTPException(
             status_code=400,
-            detail=f"Unsupported file type: {file.content_type}. Allowed: {', '.join(ALLOWED_TYPES)}",
+            detail=f"Unsupported file type: {file.content_type}. Allowed: {', '.join(ALLOWED_TYPES)}",  # noqa: E501
         )
 
     contents = await file.read()

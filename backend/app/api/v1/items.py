@@ -11,7 +11,7 @@ PATCH  /api/v1/items/{id}/status — Mark as sold/reserved/available
 
 from datetime import datetime, timezone
 from typing import Optional, List
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
@@ -29,6 +29,7 @@ router = APIRouter()
 
 
 # ─── Schemas ───────────────────────────────────────────────────
+
 
 class ItemCreate(BaseModel):
     title: str = Field(..., min_length=3, max_length=100)
@@ -98,21 +99,24 @@ class ItemListResponse(BaseModel):
 
 # ─── Helpers ───────────────────────────────────────────────────
 
+
 def item_to_response(item: Item) -> dict:
     """Convert Item ORM object to response dict."""
     images = [img.url for img in item.images] if item.images else []
-    primary = next((img.url for img in item.images if img.is_primary), None) if item.images else None
+    primary = (
+        next((img.url for img in item.images if img.is_primary), None) if item.images else None
+    )
     return {
         "id": str(item.id),
         "title": item.title,
         "description": item.description,
-        "category": item.category.value if hasattr(item.category, 'value') else item.category,
+        "category": item.category.value if hasattr(item.category, "value") else item.category,
         "price": item.price,
-        "condition": item.condition.value if hasattr(item.condition, 'value') else item.condition,
+        "condition": item.condition.value if hasattr(item.condition, "value") else item.condition,
         "course_code": item.course_code,
         "campus_location": item.campus_location,
         "meetup_point": item.meetup_point,
-        "status": item.status.value if hasattr(item.status, 'value') else item.status,
+        "status": item.status.value if hasattr(item.status, "value") else item.status,
         "view_count": item.view_count,
         "created_at": item.created_at.isoformat() if item.created_at else "",
         "updated_at": item.updated_at.isoformat() if item.updated_at else "",
@@ -131,6 +135,7 @@ def item_to_response(item: Item) -> dict:
 
 
 # ─── Routes ────────────────────────────────────────────────────
+
 
 @router.get("", response_model=ItemListResponse)
 async def list_items(

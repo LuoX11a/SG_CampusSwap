@@ -9,8 +9,6 @@ POST   /api/v1/chat/rooms/{room_id}/messages — Send a message
 """
 
 from typing import Optional, List
-from uuid import uuid4
-
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
 from sqlalchemy import select
@@ -28,6 +26,7 @@ chat_service = ChatService()
 
 
 # ─── Schemas ───────────────────────────────────────────────────
+
 
 class CreateRoomRequest(BaseModel):
     participant_id: str
@@ -63,6 +62,7 @@ class MessageListResponse(BaseModel):
 
 
 # ─── Routes ────────────────────────────────────────────────────
+
 
 @router.get("/rooms", response_model=RoomListResponse)
 async def list_my_rooms(
@@ -152,7 +152,9 @@ async def get_messages(
         raise HTTPException(status_code=503, detail=f"Chat service unavailable: {str(e)}")
 
 
-@router.post("/rooms/{room_id}/messages", status_code=status.HTTP_201_CREATED, response_model=MessageResponse)
+@router.post(
+    "/rooms/{room_id}/messages", status_code=status.HTTP_201_CREATED, response_model=MessageResponse
+)
 async def send_message(
     room_id: str,
     req: SendMessageRequest,

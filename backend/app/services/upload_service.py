@@ -7,10 +7,7 @@ Free tier: 25 GB storage, 25 GB bandwidth/month.
 
 import hashlib
 import time
-from typing import Dict, Any, Optional
-from io import BytesIO
-
-from app.config import settings
+from typing import Dict, Any
 
 
 async def upload_to_cloudinary(
@@ -63,7 +60,7 @@ async def upload_to_cloudinary(
         ext = original_filename.split(".")[-1] if "." in original_filename else "jpg"
         mock_id = hashlib.md5(f"{user_id}_{time.time()}".encode()).hexdigest()[:12]
         return {
-            "secure_url": f"https://res.cloudinary.com/demo/image/upload/v1/sg-campusswap/{mock_id}.{ext}",
+            "secure_url": f"https://res.cloudinary.com/demo/image/upload/v1/sg-campusswap/{mock_id}.{ext}",  # noqa: E501
             "public_id": f"sg-campusswap/{mock_id}",
             "width": 1200,
             "height": 900,

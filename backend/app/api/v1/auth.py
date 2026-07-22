@@ -39,6 +39,7 @@ security = HTTPBearer()
 
 # ─── Request Schemas ───────────────────────────────────────────
 
+
 class RegisterRequest(BaseModel):
     username: str = Field(..., min_length=3, max_length=20, pattern=r"^[a-zA-Z0-9_]+$")
     email: EmailStr
@@ -72,6 +73,7 @@ class RefreshRequest(BaseModel):
 
 # ─── Response Schemas ──────────────────────────────────────────
 
+
 class TokenResponse(BaseModel):
     access_token: str
     refresh_token: str
@@ -90,7 +92,7 @@ class UserResponse(BaseModel):
     rating_count: int = 0
     is_verified: bool
 
-    @field_validator('id', mode='before')
+    @field_validator("id", mode="before")
     @classmethod
     def coerce_id(cls, v):
         return str(v)
@@ -100,6 +102,7 @@ class UserResponse(BaseModel):
 
 
 # ─── Auth Dependency ───────────────────────────────────────────
+
 
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security),
@@ -116,7 +119,9 @@ async def get_current_user(
 
     user_id = payload.get("sub")
     if not user_id:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token payload")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token payload"
+        )
 
     result = await db.execute(select(User).where(User.id == user_id))
     user = result.scalar_one_or_none()
@@ -127,6 +132,7 @@ async def get_current_user(
 
 
 # ─── Routes ────────────────────────────────────────────────────
+
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
 async def register(req: RegisterRequest, db: AsyncSession = Depends(get_db)):
@@ -198,7 +204,7 @@ async def verify_email(req: VerifyEmailRequest, db: AsyncSession = Depends(get_d
         select(EmailVerification)
         .where(EmailVerification.email == req.email)
         .where(EmailVerification.code == req.code)
-        .where(EmailVerification.is_used == False)
+        .where(EmailVerification.is_used is False)
         .where(EmailVerification.expires_at > datetime.now(timezone.utc))
         .order_by(EmailVerification.created_at.desc())
     )
@@ -254,7 +260,7 @@ async def refresh(req: RefreshRequest, db: AsyncSession = Depends(get_db)):
         select(RefreshToken)
         .where(RefreshToken.token == req.refresh_token)
         .where(RefreshToken.expires_at > datetime.now(timezone.utc))
-        .where(RefreshToken.is_revoked == False)
+        .where(RefreshToken.is_revoked is False)
     )
     token_record = result.scalar_one_or_none()
 
@@ -289,9 +295,7 @@ async def logout(
     db: AsyncSession = Depends(get_db),
 ):
     """Invalidate the refresh token."""
-    result = await db.execute(
-        select(RefreshToken).where(RefreshToken.token == req.refresh_token)
-    )
+    result = await db.execute(select(RefreshToken).where(RefreshToken.token == req.refresh_token))
     token_record = result.scalar_one_or_none()
     if token_record:
         token_record.is_revoked = True

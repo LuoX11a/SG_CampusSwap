@@ -7,7 +7,7 @@ GET  /api/v1/users/me/listings  — Get current user's listings
 GET  /api/v1/users/{id}/listings — Get a user's public listings
 """
 
-from typing import Optional, List
+from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
@@ -24,6 +24,7 @@ router = APIRouter()
 
 
 # ─── Schemas ───────────────────────────────────────────────────
+
 
 class UserProfileResponse(BaseModel):
     id: str
@@ -47,6 +48,7 @@ class ProfileUpdateRequest(BaseModel):
 
 
 # ─── Routes ────────────────────────────────────────────────────
+
 
 @router.get("/{user_id}", response_model=UserProfileResponse)
 async def get_user_profile(user_id: str, db: AsyncSession = Depends(get_db)):
@@ -150,10 +152,12 @@ async def get_my_listings(
                 "id": str(item.id),
                 "title": item.title,
                 "price": item.price,
-                "status": item.status.value if hasattr(item.status, 'value') else str(item.status),
-                "primary_image": next(
-                    (img.url for img in item.images if img.is_primary), None
-                ) if item.images else None,
+                "status": item.status.value if hasattr(item.status, "value") else str(item.status),
+                "primary_image": (
+                    next((img.url for img in item.images if img.is_primary), None)
+                    if item.images
+                    else None
+                ),
                 "created_at": item.created_at.isoformat() if item.created_at else "",
                 "view_count": item.view_count,
             }
@@ -196,13 +200,13 @@ async def get_user_listings(
                 "title": item.title,
                 "price": item.price,
                 "category": (
-                    item.category.value
-                    if hasattr(item.category, 'value')
-                    else str(item.category)
+                    item.category.value if hasattr(item.category, "value") else str(item.category)
                 ),
-                "primary_image": next(
-                    (img.url for img in item.images if img.is_primary), None
-                ) if item.images else None,
+                "primary_image": (
+                    next((img.url for img in item.images if img.is_primary), None)
+                    if item.images
+                    else None
+                ),
                 "created_at": item.created_at.isoformat() if item.created_at else "",
             }
             for item in items
