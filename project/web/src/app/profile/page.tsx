@@ -17,9 +17,13 @@ export default function ProfilePage() {
 
   if (!isAuthenticated || !user) {
     return (
-      <div className="text-center py-20">
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">Not signed in</h2>
-        <Link href="/login" className="text-blue-500 hover:text-blue-600 font-medium">Sign in to view your profile</Link>
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center bg-white rounded-xl border border-gray-200 p-8 max-w-sm">
+          <div className="text-5xl mb-4">👤</div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Not signed in</h2>
+          <p className="text-gray-500 mb-4">Sign in to view your profile and manage listings</p>
+          <Link href="/login" className="inline-flex px-6 py-2.5 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors">Sign In</Link>
+        </div>
       </div>
     );
   }

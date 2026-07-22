@@ -24,9 +24,25 @@ const CONDITIONS: { value: string; label: string }[] = [
 ];
 
 export default function CreateListingPage() {
-  const { user } = useAuthStore();
+  const { user, isAuthenticated } = useAuthStore();
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  if (!isAuthenticated || !user) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center bg-white rounded-xl border border-gray-200 p-8 max-w-sm">
+          <div className="text-5xl mb-4">🛍️</div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Sign in to sell</h2>
+          <p className="text-gray-500 mb-4">Create listings and start selling to your campus community</p>
+          <button
+            onClick={() => router.push('/login')}
+            className="inline-flex px-6 py-2.5 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors"
+          >Sign In</button>
+        </div>
+      </div>
+    );
+  }
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
