@@ -29,13 +29,18 @@ from app.main import app
 from app.database import Base, get_db
 
 # ── Test Database URL ──────────────────────────────────────────
+# Default: local PostgreSQL (docker-compose or CI postgres:15 service).
+# NOTE: Neon pooled connections (with "-pooler" in host) use PgBouncer
+# which does NOT support DDL (CREATE TABLE / DROP TABLE).
+# Use a non-pooled connection or local Postgres for running tests.
 TEST_DATABASE_URL = os.getenv(
     "TEST_DATABASE_URL",
-    "postgresql+asyncpg://neondb_owner:npg_JO1qXGLp5diV@ep-sparkling-frog-aods7suy-pooler.c-2.ap-southeast-1.aws.neon.tech/neondb?ssl=require",
+    "postgresql+asyncpg://postgres:postgres@localhost:5432/sg_campusswap_test",
 )
 
 
 # ── Synchronous TestClient (no DB needed) ──────────────────────
+
 
 @pytest.fixture
 def client():
@@ -44,6 +49,7 @@ def client():
 
 
 # ── Async HTTP Client ──────────────────────────────────────────
+
 
 @pytest_asyncio.fixture
 async def async_client():
@@ -54,6 +60,7 @@ async def async_client():
 
 
 # ── Async Database Fixtures ────────────────────────────────────
+
 
 @pytest_asyncio.fixture(scope="session")
 def event_loop():
@@ -125,10 +132,13 @@ def auth_headers(client):
     client.post("/api/v1/auth/register", json=TEST_USER)
     # Verify email directly via DB is complex; skip verification for tests
     # Login
-    resp = client.post("/api/v1/auth/login", json={
-        "email": TEST_USER["email"],
-        "password": TEST_USER["password"],
-    })
+    resp = client.post(
+        "/api/v1/auth/login",
+        json={
+            "email": TEST_USER["email"],
+            "password": TEST_USER["password"],
+        },
+    )
     if resp.status_code == 200:
         token = resp.json()["access_token"]
         return {"Authorization": f"Bearer {token}"}

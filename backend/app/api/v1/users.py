@@ -37,8 +37,7 @@ class UserProfileResponse(BaseModel):
     member_since: str
     active_listings_count: int
 
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
 
 
 class ProfileUpdateRequest(BaseModel):

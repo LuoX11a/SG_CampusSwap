@@ -1,5 +1,5 @@
 """
-SG CampusSwap �?Application Configuration.
+SG CampusSwap — Application Configuration.
 Loaded from environment variables with pydantic-settings.
 """
 

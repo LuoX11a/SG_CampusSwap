@@ -89,20 +89,55 @@ class TestCreateItem:
         "payload,expected_status",
         [
             # Missing required field 'title'
-            ({"description": "A good textbook", "category": "textbook", "price": 2500,
-              "condition": "good", "campus_location": "NTU", "meetup_point": "Library"}, 422),
+            (
+                {
+                    "description": "A good textbook",
+                    "category": "textbook",
+                    "price": 2500,
+                    "condition": "good",
+                    "campus_location": "NTU",
+                    "meetup_point": "Library",
+                },
+                422,
+            ),
             # Missing required field 'price'
-            ({"title": "CS1010 Textbook", "description": "A good textbook",
-              "category": "textbook", "condition": "good",
-              "campus_location": "NTU", "meetup_point": "Library"}, 422),
+            (
+                {
+                    "title": "CS1010 Textbook",
+                    "description": "A good textbook",
+                    "category": "textbook",
+                    "condition": "good",
+                    "campus_location": "NTU",
+                    "meetup_point": "Library",
+                },
+                422,
+            ),
             # Price not > 0
-            ({"title": "CS1010 Textbook", "description": "A good textbook",
-              "category": "textbook", "price": 0, "condition": "good",
-              "campus_location": "NTU", "meetup_point": "Library"}, 422),
+            (
+                {
+                    "title": "CS1010 Textbook",
+                    "description": "A good textbook",
+                    "category": "textbook",
+                    "price": 0,
+                    "condition": "good",
+                    "campus_location": "NTU",
+                    "meetup_point": "Library",
+                },
+                422,
+            ),
             # Invalid category
-            ({"title": "CS1010 Textbook", "description": "A good textbook",
-              "category": "invalid_category", "price": 2500, "condition": "good",
-              "campus_location": "NTU", "meetup_point": "Library"}, 422),
+            (
+                {
+                    "title": "CS1010 Textbook",
+                    "description": "A good textbook",
+                    "category": "invalid_category",
+                    "price": 2500,
+                    "condition": "good",
+                    "campus_location": "NTU",
+                    "meetup_point": "Library",
+                },
+                422,
+            ),
         ],
     )
     def test_create_item_validation(self, client, auth_headers, payload, expected_status):
@@ -153,9 +188,7 @@ class TestUpdateItemStatus:
 
     def test_update_status_without_auth_returns_403(self, client):
         """Updating status without auth should return 403."""
-        response = client.patch(
-            "/api/v1/items/some-id/status?new_status=sold"
-        )
+        response = client.patch("/api/v1/items/some-id/status?new_status=sold")
         assert response.status_code == 403
 
     def test_update_status_invalid_value_returns_422(self, client, auth_headers):

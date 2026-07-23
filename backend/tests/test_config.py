@@ -37,8 +37,16 @@ class TestSettingsDefaults:
         assert s.REFRESH_TOKEN_EXPIRE_DAYS == 7
 
     def test_cors_origins_default(self):
-        s = Settings()
-        assert s.CORS_ORIGINS == "*"
+        """CORS_ORIGINS class default is '*' (env may override)."""
+        import os
+
+        old_val = os.environ.pop("CORS_ORIGINS", None)
+        try:
+            s = Settings(_env_file=None)  # skip .env file
+            assert s.CORS_ORIGINS == "*"
+        finally:
+            if old_val is not None:
+                os.environ["CORS_ORIGINS"] = old_val
 
 
 class TestAllowedDomainsList:

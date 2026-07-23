@@ -89,9 +89,7 @@ class TestUserListings:
 
     def test_user_listings_public_access(self, client):
         """Public endpoint — should not require auth."""
-        response = client.get(
-            "/api/v1/users/00000000-0000-0000-0000-000000000000/listings"
-        )
+        response = client.get("/api/v1/users/00000000-0000-0000-0000-000000000000/listings")
         # No auth required, might fail at DB
         assert response.status_code in (200, 404, 422)
 

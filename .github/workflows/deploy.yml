@@ -72,8 +72,9 @@ jobs:
       - name: Run tests
         env:
           DATABASE_URL: postgresql+asyncpg://postgres:testpass@localhost:5432/sg_campusswap_test
+          TEST_DATABASE_URL: postgresql+asyncpg://postgres:testpass@localhost:5432/sg_campusswap_test
           JWT_SECRET: test-secret-key-ci-only
           DEBUG: "true"
         run: |
           cd backend
-          pytest tests/ -v --cov=app --cov-report=term-missing --tb=short 2>&1 | tail -80
+          pytest tests/ -v --cov=app --cov-report=term-missing --tb=short
