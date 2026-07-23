@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SG CampusSwap — Project Gantt Chart (Week 3)</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Calibri, Arial, sans-serif;
+    background: #f0f2f5;
+    padding: 20px 12px;
+  }
+  .container {
+    max-width: 1660px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+    overflow: hidden;
+  }
+  .header {
+    background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+    color: white;
+    padding: 20px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .header h1 { font-size: 24px; font-weight: 700; }
+  .header .subtitle { font-size: 13px; opacity: 0.85; }
+  .current-badge {
+    background: #FF6F00;
+    color: white;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 14px;
+    white-space: nowrap;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255,111,0,0.5); }
+    50% { box-shadow: 0 0 0 10px rgba(255,111,0,0); }
+  }
+
+  .chart-wrapper { padding: 16px 20px 24px; overflow-x: auto; }
+
+  table.gantt {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    min-width: 1300px;
+  }
+  table.gantt th, table.gantt td {
+    padding: 7px 5px;
+    text-align: center;
+    border: 1px solid #e0e0e0;
+    white-space: nowrap;
+  }
+
+  /* --- Column widths --- */
+  table.gantt th.task-col, table.gantt td.task-col {
+    text-align: left; min-width: 175px; padding-left: 12px;
+    font-weight: 600;
+    position: sticky; left: 0; background: white; z-index: 2;
+  }
+  table.gantt thead th.task-col { background: #f5f5f5; z-index: 3; }
+
+  table.gantt td.status-col { min-width: 90px; font-size: 12px; font-weight: 600; }
+
+  /* --- Week columns: past / current / future --- */
+  th.week-past { background: #E8F5E9 !important; color: #2E7D32; }
+  th.week-current {
+    background: #FFF3E0 !important; color: #E65100;
+    border-left: 3px solid #FF6F00 !important;
+    border-right: 3px solid #FF6F00 !important;
+    border-top: 3px solid #FF6F00 !important;
+  }
+  th.study-week { background: #FFF3E0; color: #E65100; }
+
+  td.week-past { background: #f1f8e9; }
+  td.week-current {
+    background: #FFF8E1;
+    border-left: 3px solid #FF6F00 !important;
+    border-right: 3px solid #FF6F00 !important;
+  }
+  td.study-week-col { background: #FFFDE7 !important; }
+
+  /* --- TODAY marker row --- */
+  tr.today-row td {
+    background: #FF6F00 !important;
+    color: white !important;
+    font-weight: 700;
+    font-size: 11px;
+    padding: 2px 4px;
+    border: none !important;
+  }
+  tr.today-row td.today-label {
+    border-radius: 0;
+    letter-spacing: 1px;
+    background: #E65100 !important;
+  }
+
+  /* --- Stage header rows --- */
+  tr.stage-header td {
+    background: #e8eaf6 !important;
+    font-weight: 700;
+    font-size: 11px;
+    color: #1a237e;
+    padding: 5px;
+    letter-spacing: 0.5px;
+  }
+
+  /* --- Bar cells --- */
+  td.bar-cell { position: relative; padding: 7px 4px; }
+
+  td.bar-cell .bar {
+    height: 22px; border-radius: 4px;
+    display: inline-block; position: relative;
+    min-width: 8px;
+  }
+
+  /* Bar segment: completed portion (darker) */
+  .bar.done {
+    opacity: 1;
+  }
+  .bar.partial {
+    background: repeating-linear-gradient(
+      -45deg,
+      transparent, transparent 4px,
+      rgba(255,255,255,0.3) 4px, rgba(255,255,255,0.3) 8px
+    ) !important;
+  }
+  .bar.future-bar { opacity: 0.35; }
+
+  /* Colors by stage */
+  .bar.initiation { background: linear-gradient(135deg, #43A047, #66BB6A); }
+  .bar.design     { background: linear-gradient(135deg, #1E88E5, #42A5F5); }
+  .bar.foundation { background: linear-gradient(135deg, #FB8C00, #FFA726); }
+  .bar.core       { background: linear-gradient(135deg, #8E24AA, #AB47BC); }
+  .bar.testing    { background: linear-gradient(135deg, #00ACC1, #26C6DA); }
+  .bar.deployment { background: linear-gradient(135deg, #E53935, #EF5350); }
+  .bar.ongoing    { background: linear-gradient(135deg, #78909C, #90A4AE); }
+
+  /* --- TODAY vertical line --- */
+  td.today-divider {
+    position: relative;
+  }
+  td.today-divider::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: #FF6F00;
+    z-index: 5;
+  }
+
+  /* --- Legend --- */
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 16px;
+    padding: 14px 20px 16px; border-top: 1px solid #eee;
+    align-items: center;
+  }
+  .legend-item {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; color: #555;
+  }
+  .legend-swatch {
+    width: 18px; height: 18px; border-radius: 3px;
+  }
+  .legend-swatch.study { background: #FFF8E1; border: 1px solid #FFC107; }
+  .legend-swatch.past { background: #E8F5E9; border: 1px solid #A5D6A7; }
+  .legend-swatch.cur  { background: #FFF3E0; border: 2px solid #FF6F00; }
+  .legend-swatch.today-line {
+    width: 4px; height: 18px; background: #FF6F00; border-radius: 2px;
+  }
+
+  /* --- Course week row --- */
+  tr.course-week-row td {
+    background: #fafafa !important; font-size: 10px; color: #888;
+    padding: 2px 4px; font-style: italic; border-top: 2px solid #ddd;
+  }
+  tr.course-week-row td.week-past { background: #E8F5E9 !important; color: #2E7D32; }
+  tr.course-week-row td.week-current { background: #FFF3E0 !important; color: #E65100; }
+  tr.course-week-row td.study-week-col { background: #FFFDE7 !important; color: #E65100; }
+
+  /* --- Progress bar (top) --- */
+  .progress-section {
+    padding: 12px 20px 0;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .progress-label { font-size: 12px; font-weight: 600; color: #555; }
+  .progress-track {
+    flex: 1; height: 10px; background: #e0e0e0; border-radius: 5px; overflow: hidden;
+    max-width: 400px;
+  }
+  .progress-fill {
+    height: 100%; width: 20.8%;
+    background: linear-gradient(90deg, #43A047, #66BB6A);
+    border-radius: 5px; transition: width 0.5s;
+  }
+
+  .footnote {
+    padding: 10px 20px; font-size: 11px; color: #999; border-top: 1px solid #eee;
+  }
+
+  /* --- Status badges --- */
+  .status-done { color: #2E7D32; }
+  .status-active { color: #E65100; }
+  .status-pending { color: #999; }
+
+  /* --- Task name strikethrough for completed --- */
+  td.task-done { color: #888; }
+  td.task-active { color: #333; font-weight: 700; }
+  td.task-pending { color: #555; }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<div class="header">
+  <div>
+    <h1>SG CampusSwap — Project Gantt Chart</h1>
+    <div class="subtitle">12-Week Timeline: 10 Teaching Weeks + 2 Study Weeks (after Week 5)</div>
+  </div>
+  <div class="current-badge">&#128197; CURRENT: Week 3</div>
+</div>
+
+<!-- Overall progress -->
+<div class="progress-section">
+  <span class="progress-label">Overall Progress:</span>
+  <div class="progress-track"><div class="progress-fill"></div></div>
+  <span style="font-size:12px;font-weight:700;color:#2E7D32;">20.8%</span>
+  <span style="font-size:11px;color:#888;">(2 of 12 weeks elapsed)</span>
+</div>
+
+<div class="chart-wrapper">
+<table class="gantt">
+<thead>
+  <tr>
+    <th class="task-col">Task / Stage</th>
+    <th class="week-past">W1</th>
+    <th class="week-past">W2</th>
+    <th class="week-current">&#9660; W3</th>
+    <th>W4</th>
+    <th>W5</th>
+    <th class="study-week">SW1</th>
+    <th class="study-week">SW2</th>
+    <th>W6</th>
+    <th>W7</th>
+    <th>W8</th>
+    <th>W9</th>
+    <th>W10</th>
+    <th class="status-col">Status</th>
+  </tr>
+</thead>
+<tbody>
+
+  <!-- STAGE 1: COMPLETED -->
+  <tr class="stage-header"><td colspan="14">&#9989; STAGE 1: Project Initiation &amp; Requirements (Week 1–2) — COMPLETED</td></tr>
+  <tr>
+    <td class="task-col task-done">Project Proposal</td>
+    <td class="bar-cell week-past" colspan="2"><span class="bar initiation done" style="width:100%"></span></td>
+    <td class="bar-cell week-current" colspan="11"></td>
+    <td class="status-col status-done">&#10003; Done</td>
+  </tr>
+  <tr>
+    <td class="task-col task-done">User Survey &amp; Research</td>
+    <td class="bar-cell week-past" colspan="2"><span class="bar initiation done" style="width:100%"></span></td>
+    <td class="bar-cell week-current" colspan="11"></td>
+    <td class="status-col status-done">&#10003; Done</td>
+  </tr>
+  <tr>
+    <td class="task-col task-done">Requirements Document</td>
+    <td class="bar-cell week-past"></td>
+    <td class="bar-cell week-past"><span class="bar initiation done" style="width:100%"></span></td>
+    <td class="bar-cell week-current"><span class="bar initiation partial" style="width:100%"></span></td>
+    <td class="bar-cell" colspan="10"></td>
+    <td class="status-col status-active">&#9679; In Progress</td>
+  </tr>
+
+  <!-- STAGE 2: IN PROGRESS -->
+  <tr class="stage-header"><td colspan="14">&#128295; STAGE 2: System Design (Week 3–4) — IN PROGRESS</td></tr>
+  <tr>
+    <td class="task-col task-active">Wireframes</td>
+    <td class="bar-cell week-past" colspan="2"></td>
+    <td class="bar-cell week-current"><span class="bar design partial" style="width:100%"></span></td>
+    <td class="bar-cell"><span class="bar design future-bar" style="width:100%"></span></td>
+    <td class="bar-cell" colspan="9"></td>
+    <td class="status-col status-active">&#9679; In Progress</td>
+  </tr>
+  <tr>
+    <td class="task-col task-pending">UI Prototype</td>
+    <td class="bar-cell week-past" colspan="3"></td>
+    <td class="bar-cell" colspan="2"><span class="bar design future-bar" style="width:100%"></span></td>
+    <td class="bar-cell" colspan="8"></td>
+    <td class="status-col status-pending">&#9675; Not Started</td>
+  </tr>
+  <tr>
+    <td class="task-col task-active">Database Design</td>
+    <td class="bar-cell week-past" colspan="2"></td>
+    <td class="bar-cell week-current" colspan="1"><span class="bar design partial" style="width:100%"></span></td>
+    <td class="bar-cell" colspan="10"></td>
+    <td class="status-col status-active">&#9679; In Progress</td>
+  </tr>
+  <tr>
+    <td class="task-col task-active">API Design</td>
+    <td class="bar-cell week-past" colspan="2"></td>
+    <td class="bar-cell week-current" colspan="1"><span class="bar design partial" style="width:100%"></span></td>
+    <td class="bar-cell" colspan="10"></td>
+    <td class="status-col status-active">&#9679; In Progress</td>
+  </tr>
+
+  <!-- STAGE 3: FUTURE -->
+  <tr class="stage-header"><td colspan="14">STAGE 3: Foundation Development (Week 5, then Week 6 after study break)</td></tr>
+  <tr>
+    <td class="task-col task-pending">Project Setup</td>
+    <td class="bar-cell week-past" colspan="4"></td>
+    <td class="bar-cell"><span class="bar foundation future-bar" style="width:100%"></span></td>
+    <td class="bar-cell study-week-col" colspan="2"></td>
+    <td class="bar-cell" colspan="6"></td>
+    <td class="status-col status-pending">&#9675; Not Started</td>
+  </tr>
+  <tr>
+    <td class="task-col task-pending">Auth Module</td>
+    <td class="bar-cell week-past" colspan="4"></td>
+    <td class="bar-cell"><span class="bar foundation future-bar" style="width:100%"></span></td>
+    <td class="bar-cell study-week-col" colspan="2"></td>
+    <td class="bar-cell"><span class="bar foundation future-bar" style="width:100%"></span></td>
+    <td class="bar-cell" colspan="5"></td>
+    <td class="status-col status-pending">&#9675; Not Started</td>
+  </tr>
+
+  <!-- STAGE 4: FUTURE -->
+  <tr class="stage-header"><td colspan="14">STAGE 4: Core Feature Development (Week 6–8 / Course Weeks 6–8)</td></tr>
+  <tr>
+    <td class="task-col task-pending">Item Listing (CRUD)</td>
+    <td class="bar-cell week-past" colspan="7"></td>
+    <td class="bar-cell" colspan="2"><span class="bar core future-bar" style="width:100%"></span></td>
+    <td class="bar-cell" colspan="4"></td>
+    <td class="status-col status-pending">&#9675; Not Started</td>
+  </tr>
+  <tr>
+    <td class="task-col task-pending">Search &amp; Filter</td>
+    <td class="bar-cell week-past" colspan="7"></td>
+    <td class="bar-cell" colspan="3"><span class="bar core future-bar" style="width:100%"></span></td>
+    <td class="bar-cell" colspan="3"></td>
+    <td class="status-col status-pending">&#9675; Not Started</td>
+  </tr>
+  <tr>
+    <td class="task-col task-pending">Chat Module</td>
+    <td class="bar-cell week-past" colspan="8"></td>
+    <td class="bar-cell" colspan="2"><span class="bar core future-bar" style="width:100%"></span></td>
+    <td class="bar-cell" colspan="3"></td>
+    <td class="status-col status-pending">&#9675; Not Started</td>
+  </tr>
+  <tr>
+    <td class="task-col task-pending">User Profile</td>
+    <td class="bar-cell week-past" colspan="8"></td>
+    <td class="bar-cell" colspan="2"><span class="bar core future-bar" style="width:100%"></span></td>
+    <td class="bar-cell" colspan="3"></td>
+    <td class="status-col status-pending">&#9675; Not Started</td>
+  </tr>
+
+  <!-- STAGE 5: FUTURE -->
+  <tr class="stage-header"><td colspan="14">STAGE 5: Testing &amp; QA (Week 8–9 / Course Weeks 8–9)</td></tr>
+  <tr>
+    <td class="task-col task-pending">Unit Testing</td>
+    <td class="bar-cell week-past" colspan="9"></td>
+    <td class="bar-cell" colspan="2"><span class="bar testing future-bar" style="width:100%"></span></td>
+    <td class="bar-cell" colspan="2"></td>
+    <td class="status-col status-pending">&#9675; Not Started</td>
+  </tr>
+  <tr>
+    <td class="task-col task-pending">Integration Testing</td>
+    <td class="bar-cell week-past" colspan="9"></td>
+    <td class="bar-cell" colspan="2"><span class="bar testing future-bar" style="width:100%"></span></td>
+    <td class="bar-cell" colspan="2"></td>
+    <td class="status-col status-pending">&#9675; Not Started</td>
+  </tr>
+  <tr>
+    <td class="task-col task-pending">Usability Testing</td>
+    <td class="bar-cell week-past" colspan="10"></td>
+    <td class="bar-cell"><span class="bar testing future-bar" style="width:100%"></span></td>
+    <td class="bar-cell" colspan="2"></td>
+    <td class="status-col status-pending">&#9675; Not Started</td>
+  </tr>
+
+  <!-- STAGE 6: FUTURE -->
+  <tr class="stage-header"><td colspan="14">STAGE 6: Deployment &amp; Final Submission (Week 9–10 / Course Weeks 9–10)</td></tr>
+  <tr>
+    <td class="task-col task-pending">Bug Fixes</td>
+    <td class="bar-cell week-past" colspan="10"></td>
+    <td class="bar-cell" colspan="2"><span class="bar deployment future-bar" style="width:100%"></span></td>
+    <td class="bar-cell" colspan="1"></td>
+    <td class="status-col status-pending">&#9675; Not Started</td>
+  </tr>
+  <tr>
+    <td class="task-col task-pending">App Deployment</td>
+    <td class="bar-cell week-past" colspan="11"></td>
+    <td class="bar-cell"><span class="bar deployment future-bar" style="width:100%"></span></td>
+    <td class="bar-cell" colspan="1"></td>
+    <td class="status-col status-pending">&#9675; Not Started</td>
+  </tr>
+  <tr>
+    <td class="task-col task-pending">Final Report</td>
+    <td class="bar-cell week-past" colspan="10"></td>
+    <td class="bar-cell" colspan="2"><span class="bar deployment future-bar" style="width:100%"></span></td>
+    <td class="bar-cell" colspan="1"></td>
+    <td class="status-col status-pending">&#9675; Not Started</td>
+  </tr>
+  <tr>
+    <td class="task-col task-pending">Presentation Prep</td>
+    <td class="bar-cell week-past" colspan="11"></td>
+    <td class="bar-cell"><span class="bar deployment future-bar" style="width:100%"></span></td>
+    <td class="bar-cell" colspan="1"></td>
+    <td class="status-col status-pending">&#9675; Not Started</td>
+  </tr>
+
+  <!-- ONGOING -->
+  <tr class="stage-header"><td colspan="14">&#128214; ONGOING: Literature Review</td></tr>
+  <tr>
+    <td class="task-col task-active">Literature Review</td>
+    <td class="bar-cell week-past" colspan="2"><span class="bar ongoing done" style="width:100%"></span></td>
+    <td class="bar-cell week-current"><span class="bar ongoing partial" style="width:100%"></span></td>
+    <td class="bar-cell" colspan="10"><span class="bar ongoing future-bar" style="width:100%"></span></td>
+    <td class="status-col status-active">&#9679; In Progress</td>
+  </tr>
+
+  <!-- Course week labeling -->
+  <tr class="course-week-row">
+    <td style="text-align:left;padding-left:12px;">Course Week</td>
+    <td class="week-past">CW1 &#10003;</td>
+    <td class="week-past">CW2 &#10003;</td>
+    <td class="week-current">CW3 &#9660;</td>
+    <td>CW4</td>
+    <td>CW5</td>
+    <td class="study-week-col" colspan="2">Study Break</td>
+    <td>CW6</td>
+    <td>CW7</td>
+    <td>CW8</td>
+    <td>CW9</td>
+    <td>CW10</td>
+    <td></td>
+  </tr>
+</tbody>
+</table>
+</div>
+
+<div class="legend">
+  <span style="font-weight:700;color:#333;font-size:12px;">Legend:</span>
+
+  <div class="legend-item"><div class="legend-swatch" style="background:linear-gradient(135deg,#43A047,#66BB6A);"></div> Initiation</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:linear-gradient(135deg,#1E88E5,#42A5F5);"></div> Design</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:linear-gradient(135deg,#FB8C00,#FFA726);"></div> Foundation</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:linear-gradient(135deg,#8E24AA,#AB47BC);"></div> Core Features</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:linear-gradient(135deg,#00ACC1,#26C6DA);"></div> Testing</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:linear-gradient(135deg,#E53935,#EF5350);"></div> Deployment</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:linear-gradient(135deg,#78909C,#90A4AE);"></div> Ongoing</div>
+  <span style="color:#ccc;margin:0 4px;">|</span>
+  <div class="legend-item"><div class="legend-swatch past"></div> Past (done)</div>
+  <div class="legend-item"><div class="legend-swatch cur"></div> Current W3</div>
+  <div class="legend-item"><div class="legend-swatch today-line"></div> Today</div>
+  <div class="legend-item"><div class="legend-swatch study"></div> Study Week</div>
+  <span style="color:#ccc;margin:0 4px;">|</span>
+  <div class="legend-item"><span style="opacity:0.35;font-size:16px;">&#9632;</span> Future</div>
+  <div class="legend-item"><span style="font-size:14px;">&#9632;&#9632;&#9632;</span> Partial (striped)</div>
+</div>
+
+<div class="footnote">
+  SG CampusSwap — Project Scope &amp; PMP &nbsp;|&nbsp; Current: Week 3 (Course Week 3) &nbsp;|&nbsp;
+  Stage 1 Complete, Stage 2 In Progress &nbsp;|&nbsp; Next milestone: System Design complete by end of Week 4
+</div>
+
+</div>
+
+</body>
+</html>

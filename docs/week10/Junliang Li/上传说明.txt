@@ -1,0 +1,7 @@
+﻿=== Junliang Li 上传说明 ===
+角色: QA/UX
+上传内容: 设计规范 + 测试计划 + 可用性测试
+
+上传步骤:
+1. 将 Junliang-Li/docs/week8/ 下所有文件 → 项目 docs/week8/
+2. 将 Junliang-Li/docs/week9/ 下所有文件 → 项目 docs/week9/

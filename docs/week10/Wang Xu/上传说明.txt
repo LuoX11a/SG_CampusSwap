@@ -1,0 +1,7 @@
+﻿=== Wang Xu 上传说明 ===
+角色: Backend Developer
+上传内容: Service层 + 后端测试
+
+上传步骤:
+1. 将 Wang-Xu/backend/app/services/ 下所有文件 → 项目 backend/app/services/
+2. 将 Wang-Xu/backend/tests/ 下所有文件 → 项目 backend/tests/
