@@ -1,0 +1,11 @@
+﻿=== Huang Hongrui — PM 上传说明 ===
+
+【上传内容】
+✅ Week 8 PM 文档: 风险登记/冲刺待办/会议议程/进度报告
+✅ Week 9 PM 文档: 风险登记/冲刺待办/会议议程/进度报告/视频脚本
+✅ Week 10 最终报告: WEEK10_FINAL_REPORT.md
+
+【上传步骤】
+1. Huang-Hongrui/docs/week8/*  → docs/week8/
+2. Huang-Hongrui/docs/week9/*  → docs/week9/
+3. Huang-Hongrui/docs/week10/* → docs/week10/
