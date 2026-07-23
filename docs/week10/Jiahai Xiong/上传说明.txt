@@ -1,8 +1,0 @@
-﻿=== Jiahai Xiong 上传说明 ===
-角色: Frontend Developer
-上传内容: 扩展页面 + FilterModal组件
-
-上传步骤:
-1. 将 Jiahai-Xiong/web/src/app/ 下所有页面 → 项目 project/web/src/app/
-   (messages, my-listings, profile, reviews, settings)
-2. 将 Jiahai-Xiong/web/src/components/FilterModal.tsx → 项目 project/web/src/components/
