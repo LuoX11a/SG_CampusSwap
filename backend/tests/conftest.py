@@ -20,7 +20,12 @@ import pytest
 import pytest_asyncio
 from fastapi.testclient import TestClient
 from httpx import AsyncClient, ASGITransport
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import (
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
+from sqlalchemy.pool import NullPool
 
 # Enable DEBUG mode for tests (bypasses email verification)
 os.environ["DEBUG"] = "true"
@@ -39,34 +44,6 @@ TEST_DATABASE_URL = os.getenv(
 )
 
 
-# ── Synchronous TestClient (no DB needed) ──────────────────────
-
-
-@pytest.fixture
-def client(test_engine):
-    """HTTP TestClient bound to the FastAPI app.
-
-    Depends on test_engine so database tables are created before
-    any HTTP request hits the database.
-    """
-    return TestClient(app)
-
-
-# ── Async HTTP Client ──────────────────────────────────────────
-
-
-@pytest_asyncio.fixture
-async def async_client(test_engine):
-    """Async HTTP client for testing async endpoints.
-
-    Depends on test_engine so database tables are created before
-    any HTTP request hits the database.
-    """
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as ac:
-        yield ac
-
-
 # ── Async Database Fixtures ────────────────────────────────────
 
 
@@ -80,8 +57,12 @@ def event_loop():
 
 @pytest_asyncio.fixture(scope="session")
 async def test_engine():
-    """Create a test database engine."""
-    engine = create_async_engine(TEST_DATABASE_URL, echo=False)
+    """Create a test database engine with NullPool.
+
+    NullPool avoids asyncpg "another operation in progress" errors
+    caused by TestClient creating separate event loops per request.
+    """
+    engine = create_async_engine(TEST_DATABASE_URL, echo=False, poolclass=NullPool)
 
     # Create all tables
     async with engine.begin() as conn:
@@ -113,6 +94,59 @@ async def test_db(test_engine) -> AsyncGenerator[AsyncSession, None]:
         async with session.begin():
             yield session
             await session.rollback()
+
+
+# ── Override app DB dependency to use test engine ──────────────
+# This ensures the FastAPI app uses the same engine (NullPool)
+# that has tables created by the test fixtures.
+
+
+@pytest.fixture(autouse=True)
+def override_db(test_engine):
+    """Override the app's get_db with a session from the test engine.
+
+    Uses NullPool to avoid asyncpg event-loop conflicts when TestClient
+    runs requests in separate event loops.
+    """
+    async_session_factory = async_sessionmaker(
+        test_engine,
+        class_=AsyncSession,
+        expire_on_commit=False,
+    )
+
+    async def _get_test_db():
+        async with async_session_factory() as session:
+            try:
+                yield session
+                await session.commit()
+            except Exception:
+                await session.rollback()
+                raise
+
+    app.dependency_overrides[get_db] = _get_test_db
+    yield
+    app.dependency_overrides.clear()
+
+
+# ── HTTP Client Fixtures ───────────────────────────────────────
+
+
+@pytest.fixture
+def client(override_db):
+    """HTTP TestClient bound to the FastAPI app.
+
+    Uses overridden DB dependency (NullPool) so tests don't hit
+    asyncpg event-loop issues.
+    """
+    return TestClient(app)
+
+
+@pytest_asyncio.fixture
+async def async_client(override_db):
+    """Async HTTP client for testing async endpoints."""
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+        yield ac
 
 
 # ── Authenticated Client Fixtures ───────────────────────────────
