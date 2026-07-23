@@ -8,7 +8,7 @@ GET    /api/v1/reviews/rating-summary/{user_id} — Rating distribution
 """
 
 from typing import List
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
@@ -57,7 +57,7 @@ class RatingSummary(BaseModel):
 
 @router.get("/user/{user_id}", response_model=List[ReviewResponse])
 async def get_user_reviews(
-    user_id: str,
+    user_id: UUID,
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=50),
     db: AsyncSession = Depends(get_db),
@@ -194,7 +194,7 @@ async def get_my_reviews(
 
 
 @router.get("/rating-summary/{user_id}", response_model=RatingSummary)
-async def get_rating_summary(user_id: str, db: AsyncSession = Depends(get_db)):
+async def get_rating_summary(user_id: UUID, db: AsyncSession = Depends(get_db)):
     """Get rating distribution for a user."""
     distribution = {}
     for rating in range(1, 6):
