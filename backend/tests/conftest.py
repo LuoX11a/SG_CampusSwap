@@ -43,8 +43,12 @@ TEST_DATABASE_URL = os.getenv(
 
 
 @pytest.fixture
-def client():
-    """HTTP TestClient bound to the FastAPI app (no database)."""
+def client(test_engine):
+    """HTTP TestClient bound to the FastAPI app.
+
+    Depends on test_engine so database tables are created before
+    any HTTP request hits the database.
+    """
     return TestClient(app)
 
 
@@ -52,8 +56,12 @@ def client():
 
 
 @pytest_asyncio.fixture
-async def async_client():
-    """Async HTTP client for testing async endpoints."""
+async def async_client(test_engine):
+    """Async HTTP client for testing async endpoints.
+
+    Depends on test_engine so database tables are created before
+    any HTTP request hits the database.
+    """
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         yield ac
