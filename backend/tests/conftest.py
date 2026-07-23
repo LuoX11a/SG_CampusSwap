@@ -101,12 +101,30 @@ async def test_db(test_engine) -> AsyncGenerator[AsyncSession, None]:
 # that has tables created by the test fixtures.
 
 
+@pytest.fixture(scope="module", autouse=True)
+def cleanup_db(test_engine):
+    """Truncate all tables before each test module for a clean slate."""
+    from sqlalchemy import text
+
+    async def _truncate():
+        async with test_engine.begin() as conn:
+            for table in reversed(Base.metadata.sorted_tables):
+                await conn.execute(
+                    text(f"TRUNCATE TABLE {table.name} CASCADE")
+                )
+
+    asyncio.get_event_loop().run_until_complete(_truncate())
+    yield
+    asyncio.get_event_loop().run_until_complete(_truncate())
+
+
 @pytest.fixture
 def override_db(test_engine):
     """Override the app's get_db with a session from the test engine.
 
     Uses NullPool to avoid asyncpg event-loop conflicts when TestClient
-    runs requests in separate event loops.
+    runs requests in separate event loops.  Commits normally so that
+    sequences like register→login work within a single test.
     """
     async_session_factory = async_sessionmaker(
         test_engine,
@@ -116,14 +134,12 @@ def override_db(test_engine):
 
     async def _get_test_db():
         async with async_session_factory() as session:
-            async with session.begin():
-                try:
-                    yield session
-                except Exception:
-                    await session.rollback()
-                    raise
-                finally:
-                    await session.rollback()
+            try:
+                yield session
+                await session.commit()
+            except Exception:
+                await session.rollback()
+                raise
 
     app.dependency_overrides[get_db] = _get_test_db
     yield
