@@ -32,8 +32,7 @@ class SearchItemResult(BaseModel):
     primary_image: Optional[str]
     relevance: float = 1.0
 
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
 
 
 class SearchResponse(BaseModel):

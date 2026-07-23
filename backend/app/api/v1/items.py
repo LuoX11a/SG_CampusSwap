@@ -63,8 +63,7 @@ class SellerInfo(BaseModel):
     rating_avg: Optional[float]
     rating_count: int
 
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
 
 
 class ItemResponse(BaseModel):
@@ -85,8 +84,7 @@ class ItemResponse(BaseModel):
     images: List[str]
     primary_image: Optional[str] = None
 
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
 
 
 class ItemListResponse(BaseModel):

@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Team Code of Conduct Agreement — SG CampusSwap</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', 'Segoe UI', Calibri, sans-serif;
+    background: #f0f2f5;
+    padding: 20px;
+    color: #333;
+    line-height: 1.6;
+  }
+
+  .page {
+    max-width: 900px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.1);
+    overflow: hidden;
+  }
+
+  /* ===== HEADER ===== */
+  .cover {
+    background: linear-gradient(135deg, #0d1b4a 0%, #1a237e 40%, #283593 100%);
+    color: white;
+    padding: 40px 48px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle at 30% 70%, rgba(255,255,255,0.04) 0%, transparent 50%);
+  }
+  .cover h1 {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+    position: relative;
+  }
+  .cover .project-name {
+    font-size: 16px;
+    font-weight: 500;
+    opacity: 0.8;
+    position: relative;
+    margin-bottom: 16px;
+  }
+  .cover .badge-row {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    position: relative;
+  }
+  .cover .badge {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    backdrop-filter: blur(4px);
+  }
+
+  /* ===== SECTION ===== */
+  .content { padding: 32px 48px 40px; }
+
+  .section {
+    margin-bottom: 28px;
+    border: 1px solid #e8e8e8;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .section-title {
+    background: #f5f6fa;
+    padding: 12px 20px;
+    font-weight: 700;
+    font-size: 15px;
+    color: #1a237e;
+    border-bottom: 1px solid #e8e8e8;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-title .icon {
+    font-size: 20px;
+  }
+  .section-body { padding: 16px 20px; }
+
+  /* ===== TEAM TABLE ===== */
+  .team-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .team-table thead th {
+    background: #1a237e;
+    color: white;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .team-table thead th:first-child { border-radius: 6px 0 0 0; }
+  .team-table thead th:last-child { border-radius: 0 6px 0 0; }
+  .team-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .team-table tbody tr:hover td { background: #fafbff; }
+  .role-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .role-pm { background: #FFF3E0; color: #E65100; }
+  .role-fe { background: #E3F2FD; color: #1565C0; }
+  .role-be { background: #E8F5E9; color: #2E7D32; }
+  .role-ui { background: #F3E5F5; color: #7B1FA2; }
+  .role-qa { background: #E0F7FA; color: #00838F; }
+  .role-devops { background: #FCE4EC; color: #C62828; }
+
+  /* ===== RULES LIST ===== */
+  .rules-list { list-style: none; }
+  .rules-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid #f5f5f5;
+    display: flex;
+    gap: 12px;
+    font-size: 13px;
+  }
+  .rules-list li:last-child { border-bottom: none; }
+  .rule-num {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: #e8eaf6;
+    color: #1a237e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+
+  /* ===== MEETING SCHEDULE ===== */
+  .meeting-card {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+  }
+  .meeting-item {
+    background: #fafbff;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    padding: 14px;
+  }
+  .meeting-item .meeting-name {
+    font-weight: 700;
+    font-size: 13px;
+    color: #1a237e;
+    margin-bottom: 4px;
+  }
+  .meeting-item .meeting-detail {
+    font-size: 12px;
+    color: #777;
+  }
+
+  /* ===== ESCALATION LADDER ===== */
+  .escalation {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    padding: 8px 0;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .esc-step {
+    background: #f5f6fa;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 12px 16px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    min-width: 120px;
+  }
+  .esc-step.active { border-color: #1a237e; background: #e8eaf6; color: #1a237e; }
+  .esc-arrow { font-size: 20px; color: #bbb; margin: 0 4px; }
+
+  /* ===== COMMITMENT BOX ===== */
+  .commitment-box {
+    background: linear-gradient(135deg, #e8eaf6, #f5f6fa);
+    border: 2px solid #c5cae9;
+    border-radius: 10px;
+    padding: 20px 24px;
+    font-size: 13px;
+  }
+  .commitment-box h4 {
+    font-size: 14px;
+    color: #1a237e;
+    margin-bottom: 8px;
+  }
+
+  /* ===== SIGNATURE AREA ===== */
+  .signatures {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 20px;
+  }
+  .sig-card {
+    border: 1.5px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px 14px;
+    text-align: center;
+    background: #fafbff;
+  }
+  .sig-card .sig-name {
+    font-weight: 700;
+    font-size: 15px;
+    color: #1a237e;
+    margin-bottom: 4px;
+  }
+  .sig-card .sig-role {
+    font-size: 11px;
+    color: #888;
+  }
+
+  /* ===== FOOTER ===== */
+  .footer {
+    text-align: center;
+    padding: 16px 48px 24px;
+    font-size: 11px;
+    color: #aaa;
+    border-top: 1px solid #f0f0f0;
+  }
+
+  /* ===== PRINT STYLES ===== */
+  @media print {
+    body { background: white; padding: 0; }
+    .page { box-shadow: none; border-radius: 0; max-width: 100%; }
+    .cover { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .sig-card { min-height: 120px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- ============ COVER ============ -->
+  <div class="cover">
+    <h1>Team Code of Conduct Agreement</h1>
+    <div class="project-name">SG CampusSwap — Mobile App Development Project</div>
+    <div class="badge-row">
+      <span class="badge">12-Week Timeline</span>
+      <span class="badge">6 Team Members</span>
+      <span class="badge">Agile / Scrum</span>
+      <span class="badge">Week 3 of 12</span>
+    </div>
+  </div>
+
+  <!-- ============ CONTENT ============ -->
+  <div class="content">
+
+    <!-- SECTION 1: TEAM -->
+    <div class="section">
+      <div class="section-title"><span class="icon">&#128101;</span> 1. Team Members &amp; Roles</div>
+      <div class="section-body">
+        <table class="team-table">
+          <thead>
+            <tr><th>#</th><th>Name</th><th>Role</th><th>Key Responsibilities</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td><td>Huang Hongrui</td>
+              <td><span class="role-badge role-pm">Project Manager</span></td>
+              <td>Project planning &amp; coordination, stakeholder communication, risk management, meeting minutes, final report oversight</td>
+            </tr>
+            <tr>
+              <td>2</td><td>Renxian Tang</td>
+              <td><span class="role-badge role-fe">Frontend Developer (Lead)</span></td>
+              <td>React Native app architecture, core screen implementation, navigation &amp; state management, API integration</td>
+            </tr>
+            <tr>
+              <td>3</td><td>Wang Bowei</td>
+              <td><span class="role-badge role-be">Backend Developer (Lead)</span></td>
+              <td>RESTful API design &amp; development, PostgreSQL database schema, .edu.sg auth system, AWS deployment</td>
+            </tr>
+            <tr>
+              <td>4</td><td>Jiahai Xiong</td>
+              <td><span class="role-badge role-fe">Frontend Developer</span></td>
+              <td>Chat module UI, user profile &amp; rating screens, search &amp; filter interface, component testing</td>
+            </tr>
+            <tr>
+              <td>5</td><td>Wang Xu</td>
+              <td><span class="role-badge role-be">Backend Developer</span></td>
+              <td>Firebase real-time chat integration, image upload API (Cloudinary), search indexing, API documentation</td>
+            </tr>
+            <tr>
+              <td>6</td><td>Junliang Li</td>
+              <td><span class="role-badge role-qa">UI/UX Designer &amp; QA</span></td>
+              <td>Wireframes &amp; high-fidelity mockups (Figma), usability testing, test case writing, bug tracking, testing report</td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="margin-top:12px;font-size:12px;color:#888;"><em>Note: All members contribute to the Literature Review on an ongoing basis throughout the semester.</em></p>
+      </div>
+    </div>
+
+    <!-- SECTION 2: COMMUNICATION -->
+    <div class="section">
+      <div class="section-title"><span class="icon">&#128172;</span> 2. Communication &amp; Meetings</div>
+      <div class="section-body">
+
+        <p style="font-size:13px;font-weight:600;margin-bottom:12px;">&#128488; Communication Channels</p>
+        <ul class="rules-list">
+          <li><span class="rule-num">1</span> <span><strong>WeChat Group</strong> — Daily asynchronous communication. All members must respond to direct mentions within <strong>12 hours</strong>.</span></li>
+          <li><span class="rule-num">2</span> <span><strong>GitHub Issues &amp; Pull Requests</strong> — All technical discussions, code reviews, and task tracking. PRs require <strong>at least one review</strong> before merging.</span></li>
+          <li><span class="rule-num">3</span> <span><strong>Google Drive</strong> — Central repository for all project documentation (meeting minutes, reports, design files). All members must maintain their sections.</span></li>
+          <li><span class="rule-num">4</span> <span><strong>Trello / Notion</strong> — Product backlog and sprint task board. Updated <strong>before every sprint review</strong>.</span></li>
+        </ul>
+
+        <p style="font-size:13px;font-weight:600;margin:16px 0 12px;">&#128197; Regular Meeting Schedule</p>
+        <div class="meeting-card">
+          <div class="meeting-item">
+            <div class="meeting-name">&#128198; Weekly Team Meeting</div>
+            <div class="meeting-detail">Every Wednesday, 11:00 AM–1:00 PM<br>Face-to-face (team gathering slot)<br>All public/team matters handled in this window</div>
+          </div>
+          <div class="meeting-item">
+            <div class="meeting-name">&#128260; Sprint Review</div>
+            <div class="meeting-detail">Every other Friday, 5:00–6:00 PM<br>Demo completed features<br>Stakeholder update</div>
+          </div>
+          <div class="meeting-item">
+            <div class="meeting-name">&#128221; Sprint Retrospective</div>
+            <div class="meeting-detail">After each Sprint Review<br>30–45 minutes<br>What went well / what to improve</div>
+          </div>
+          <div class="meeting-item">
+            <div class="meeting-name">&#128172; Stand-up (Async)</div>
+            <div class="meeting-detail">Tue / Wed / Thu by 10:00 AM<br>WeChat text update<br>3 questions format</div>
+          </div>
+        </div>
+        <p style="margin-top:10px;font-size:12px;color:#888;">Meeting minutes must be documented in Google Drive within 24 hours of each meeting. Rotating note-taker schedule.</p>
+      </div>
+    </div>
+
+    <!-- SECTION 3: CODE OF CONDUCT -->
+    <div class="section">
+      <div class="section-title"><span class="icon">&#128220;</span> 3. Code of Conduct &amp; Expectations</div>
+      <div class="section-body">
+        <ul class="rules-list">
+          <li><span class="rule-num">1</span> <span><strong>Respect &amp; Inclusivity</strong> — All team members will treat each other with respect. We value diverse opinions and foster an inclusive environment. No form of harassment, discrimination, or disrespectful language will be tolerated.</span></li>
+          <li><span class="rule-num">2</span> <span><strong>Accountability</strong> — Each member takes ownership of their assigned tasks. If a deadline cannot be met, the member must notify the Project Manager <strong>at least 24 hours in advance</strong> to arrange support or redistribution.</span></li>
+          <li><span class="rule-num">3</span> <span><strong>Punctuality</strong> — Attend all scheduled meetings on time. If unable to attend, notify the team at least <strong>2 hours before</strong> the meeting and catch up via meeting minutes.</span></li>
+          <li><span class="rule-num">4</span> <span><strong>Quality &amp; Integrity</strong> — All code must be reviewed before merging. No plagiarism. All external sources must be properly cited. Commit messages must be clear and descriptive.</span></li>
+          <li><span class="rule-num">5</span> <span><strong>Constructive Feedback</strong> — Give feedback that is specific, actionable, and kind. Receive feedback with an open mind. The goal is team growth, not blame.</span></li>
+          <li><span class="rule-num">6</span> <span><strong>Transparency</strong> — Share progress, blockers, and concerns openly. No hiding problems — early communication prevents last-minute crises.</span></li>
+          <li><span class="rule-num">7</span> <span><strong>Contribution Balance</strong> — Workload should be distributed fairly. If any member feels overburdened or underutilized, they should raise it with the PM immediately.</span></li>
+          <li><span class="rule-num">8</span> <span><strong>Continuous Improvement</strong> — Each sprint retrospective must produce at least one actionable improvement item. The team commits to implementing it in the next sprint.</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- SECTION 4: DECISION MAKING & CONFLICT -->
+    <div class="section">
+      <div class="section-title"><span class="icon">&#9878;</span> 4. Decision-Making &amp; Conflict Resolution</div>
+      <div class="section-body">
+
+        <p style="font-size:13px;font-weight:600;margin-bottom:10px;">&#128202; Decision-Making Process</p>
+        <ul class="rules-list">
+          <li><span class="rule-num">1</span> <span><strong>Consensus First</strong> — The team aims for consensus on all major decisions (scope changes, architecture choices, timeline adjustments).</span></li>
+          <li><span class="rule-num">2</span> <span><strong>Majority Vote</strong> — If consensus cannot be reached after thorough discussion, a majority vote (4 of 6) decides. The PM casts the tie-breaking vote if needed.</span></li>
+          <li><span class="rule-num">3</span> <span><strong>PM Authority</strong> — For urgent operational decisions (e.g., merging a hotfix, reassigning a task due to illness), the PM has authority to decide unilaterally and inform the team afterward.</span></li>
+          <li><span class="rule-num">4</span> <span><strong>Scope Changes</strong> — Any feature addition after Week 4 requires a team vote and timeline re-evaluation. The default answer is "add to Future Version backlog."</span></li>
+        </ul>
+
+        <p style="font-size:13px;font-weight:600;margin:16px 0 10px;">&#128736; Conflict Resolution Escalation Path</p>
+        <div class="escalation">
+          <div class="esc-step active">Step 1<br>Direct conversation<br>between parties</div>
+          <span class="esc-arrow">&#10132;</span>
+          <div class="esc-step">Step 2<br>PM mediates<br>the discussion</div>
+          <span class="esc-arrow">&#10132;</span>
+          <div class="esc-step">Step 3<br>Team meeting<br>to resolve jointly</div>
+          <span class="esc-arrow">&#10132;</span>
+          <div class="esc-step">Step 4<br>Consult course<br>instructor / tutor</div>
+        </div>
+        <p style="margin-top:10px;font-size:12px;color:#888;">Conflicts should be addressed within <strong>48 hours</strong> of arising. Do not let issues fester.</p>
+      </div>
+    </div>
+
+    <!-- SECTION 5: WORK PRACTICES -->
+    <div class="section">
+      <div class="section-title"><span class="icon">&#128187;</span> 5. Technical Work Practices</div>
+      <div class="section-body">
+        <ul class="rules-list">
+          <li><span class="rule-num">1</span> <span><strong>Branching Strategy</strong> — <code>main</code> branch is always deployable. Feature branches named <code>feature/&lt;name&gt;</code>. Bug fixes in <code>fix/&lt;name&gt;</code>. Never commit directly to <code>main</code>.</span></li>
+          <li><span class="rule-num">2</span> <span><strong>Code Review</strong> — Every PR requires at least <strong>one approving review</strong> from a different team member. Review within 24 hours of request.</span></li>
+          <li><span class="rule-num">3</span> <span><strong>Documentation</strong> — API endpoints documented in the shared Google Doc. README kept up-to-date. Complex logic should have inline comments explaining <em>why</em>, not what.</span></li>
+          <li><span class="rule-num">4</span> <span><strong>Testing</strong> — Write unit tests for critical paths (auth, listing CRUD, chat). Manual testing checklist before each sprint review. Bugs logged in GitHub Issues with clear reproduction steps.</span></li>
+          <li><span class="rule-num">5</span> <span><strong>Commits</strong> — Commit messages follow conventional commits: <code>feat:</code>, <code>fix:</code>, <code>docs:</code>, <code>refactor:</code>, <code>test:</code>. Commit early, commit often.</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- SECTION 6: COMMITMENT -->
+    <div class="section">
+      <div class="section-title"><span class="icon">&#9997;</span> 6. Team Commitment Statement</div>
+      <div class="section-body">
+        <div class="commitment-box">
+          <h4>As members of the SG CampusSwap project team, we collectively agree to:</h4>
+          <p style="margin-top:6px;">
+            &#10003; Dedicate approximately <strong>6–8 hours per week</strong> to this project outside of scheduled meetings.<br>
+            &#10003; Complete all assigned tasks by agreed-upon deadlines, or communicate early if unable to do so.<br>
+            &#10003; Attend all scheduled meetings prepared and on time.<br>
+            &#10003; Uphold the principles of respect, transparency, and accountability in all team interactions.<br>
+            &#10003; Produce our best work — this project represents our collective capability to future employers and stakeholders.<br>
+            &#10003; Support fellow team members when they face challenges. We succeed or fail <strong>as a team</strong>.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 7: SIGNATURES -->
+    <div class="section">
+      <div class="section-title"><span class="icon">&#9998;</span> 7. Signatures — Agreement to this Code of Conduct</div>
+      <div class="section-body">
+        <p style="font-size:13px;color:#666;margin-bottom:16px;">
+          By signing below, each team member confirms they have read, understood, and agree to abide by this Code of Conduct Agreement throughout the SG CampusSwap project duration (2026 TR2).
+        </p>
+        <div class="signatures">
+          <div class="sig-card">
+            <div class="sig-name">Huang Hongrui</div>
+            <div class="sig-role">Project Manager</div>
+          </div>
+          <div class="sig-card">
+            <div class="sig-name">Renxian Tang</div>
+            <div class="sig-role">Frontend Developer (Lead)</div>
+          </div>
+          <div class="sig-card">
+            <div class="sig-name">Wang Bowei</div>
+            <div class="sig-role">Backend Developer (Lead)</div>
+          </div>
+          <div class="sig-card">
+            <div class="sig-name">Jiahai Xiong</div>
+            <div class="sig-role">Frontend Developer</div>
+          </div>
+          <div class="sig-card">
+            <div class="sig-name">Wang Xu</div>
+            <div class="sig-role">Backend Developer</div>
+          </div>
+          <div class="sig-card">
+            <div class="sig-name">Junliang Li</div>
+            <div class="sig-role">UI/UX Designer &amp; QA</div>
+          </div>
+        </div>
+        <p style="margin-top:16px;font-size:12px;color:#888;text-align:center;">
+          Date of Agreement: 3 June 2026 &nbsp;|&nbsp; This document is valid for the full project duration (12 weeks)
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    SG CampusSwap — Team Code of Conduct Agreement &nbsp;|&nbsp; Generated June 2026 &nbsp;|&nbsp;
+    Refer to LearnJCU for Teamwork Activity Book requirements
+  </div>
+
+</div>
+
+</body>
+</html>

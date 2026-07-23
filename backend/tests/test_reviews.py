@@ -15,9 +15,7 @@ class TestGetUserReviews:
 
     def test_get_user_reviews_public_access(self, client):
         """Public endpoint — should not require auth."""
-        response = client.get(
-            "/api/v1/reviews/user/00000000-0000-0000-0000-000000000000"
-        )
+        response = client.get("/api/v1/reviews/user/00000000-0000-0000-0000-000000000000")
         assert response.status_code in (200, 404)
 
     def test_get_user_reviews_invalid_uuid(self, client):
@@ -96,16 +94,12 @@ class TestRatingSummary:
 
     def test_rating_summary_public_access(self, client):
         """Public endpoint — should return rating distribution."""
-        response = client.get(
-            "/api/v1/reviews/rating-summary/00000000-0000-0000-0000-000000000000"
-        )
+        response = client.get("/api/v1/reviews/rating-summary/00000000-0000-0000-0000-000000000000")
         assert response.status_code in (200, 404)
 
     def test_rating_summary_structure(self, client):
         """Response should include average, total, and distribution."""
-        response = client.get(
-            "/api/v1/reviews/rating-summary/00000000-0000-0000-0000-000000000000"
-        )
+        response = client.get("/api/v1/reviews/rating-summary/00000000-0000-0000-0000-000000000000")
         if response.status_code == 200:
             data = response.json()
             assert "average" in data
