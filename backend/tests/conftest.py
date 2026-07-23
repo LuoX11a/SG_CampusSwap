@@ -101,7 +101,7 @@ async def test_db(test_engine) -> AsyncGenerator[AsyncSession, None]:
 # that has tables created by the test fixtures.
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture
 def override_db(test_engine):
     """Override the app's get_db with a session from the test engine.
 
