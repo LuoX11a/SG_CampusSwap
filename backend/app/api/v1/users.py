@@ -7,6 +7,7 @@ GET  /api/v1/users/me/listings  — Get current user's listings
 GET  /api/v1/users/{id}/listings — Get a user's public listings
 """
 
+import uuid
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -50,7 +51,7 @@ class ProfileUpdateRequest(BaseModel):
 
 
 @router.get("/{user_id}", response_model=UserProfileResponse)
-async def get_user_profile(user_id: str, db: AsyncSession = Depends(get_db)):
+async def get_user_profile(user_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
     """Get a user's public profile."""
     result = await db.execute(select(User).where(User.id == user_id))
     user = result.scalar_one_or_none()
@@ -170,7 +171,7 @@ async def get_my_listings(
 
 @router.get("/{user_id}/listings")
 async def get_user_listings(
-    user_id: str,
+    user_id: uuid.UUID,
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=50),
     db: AsyncSession = Depends(get_db),
