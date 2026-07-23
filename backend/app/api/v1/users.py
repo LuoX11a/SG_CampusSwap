@@ -215,3 +215,56 @@ async def get_user_listings(
         "page": page,
         "page_size": page_size,
     }
+
+
+# ── Account Management ────────────────────────────────────────────
+
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str = Field(..., min_length=8)
+    new_password: str = Field(..., min_length=8)
+
+
+@router.post("/me/change-password")
+async def change_password(
+    req: ChangePasswordRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Change the current user's password."""
+    from app.services.auth_service import hash_password, verify_password
+
+    if not verify_password(req.current_password, current_user.password_hash):
+        raise HTTPException(status_code=400, detail="Current password is incorrect")
+    if req.current_password == req.new_password:
+        raise HTTPException(status_code=400, detail="New password must differ from current")
+
+    if not any(c.isupper() for c in req.new_password):
+        raise HTTPException(status_code=400, detail="Password must contain an uppercase letter")
+    if not any(c.isdigit() for c in req.new_password):
+        raise HTTPException(status_code=400, detail="Password must contain a digit")
+
+    current_user.password_hash = hash_password(req.new_password)
+    await db.commit()
+    return {"message": "Password changed successfully"}
+
+
+class DeleteAccountRequest(BaseModel):
+    password: str = Field(..., min_length=8)
+
+
+@router.post("/me/delete-account")
+async def delete_account(
+    req: DeleteAccountRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Delete the current user's account. Requires password confirmation."""
+    from app.services.auth_service import verify_password
+
+    if not verify_password(req.password, current_user.password_hash):
+        raise HTTPException(status_code=400, detail="Password is incorrect")
+
+    await db.delete(current_user)
+    await db.commit()
+    return {"message": "Account deleted successfully"}

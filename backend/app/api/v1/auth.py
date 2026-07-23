@@ -203,7 +203,7 @@ async def verify_email(req: VerifyEmailRequest, db: AsyncSession = Depends(get_d
         select(EmailVerification)
         .where(EmailVerification.email == req.email)
         .where(EmailVerification.code == req.code)
-        .where(EmailVerification.is_used is False)
+        .where(~EmailVerification.is_used)
         .where(EmailVerification.expires_at > datetime.now(timezone.utc))
         .order_by(EmailVerification.created_at.desc())
     )
@@ -259,7 +259,7 @@ async def refresh(req: RefreshRequest, db: AsyncSession = Depends(get_db)):
         select(RefreshToken)
         .where(RefreshToken.token == req.refresh_token)
         .where(RefreshToken.expires_at > datetime.now(timezone.utc))
-        .where(RefreshToken.is_revoked is False)
+        .where(~RefreshToken.is_revoked)
     )
     token_record = result.scalar_one_or_none()
 

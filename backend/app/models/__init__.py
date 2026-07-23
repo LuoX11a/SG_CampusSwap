@@ -1,3 +1,4 @@
+from app.models.chat import ChatMessage, ChatRoom
 from app.models.item import Item, ItemCategory, ItemCondition, ItemStatus
 from app.models.review import (
     EmailVerification,
@@ -21,4 +22,6 @@ __all__ = [
     "TransactionStatus",
     "EmailVerification",
     "RefreshToken",
+    "ChatRoom",
+    "ChatMessage",
 ]

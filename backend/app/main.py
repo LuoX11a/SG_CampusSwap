@@ -6,8 +6,11 @@ Deploy: Render (backend) + Vercel (frontend) + Neon PostgreSQL
 
 from contextlib import asynccontextmanager
 
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.config import settings
 
@@ -27,9 +30,13 @@ async def lifespan(app: FastAPI):
         from sqlalchemy import text
         from app.database import get_engine
 
+        from app.database import Base
+
         engine = get_engine()
         async with engine.begin() as conn:
             await conn.execute(text("SELECT 1"))
+            # Auto-create any new tables (idempotent)
+            await conn.run_sync(Base.metadata.create_all)
         logger.info("Database engine warmed up and connected")
     except Exception as exc:
         logger.error(f"Lifespan startup error: {type(exc).__name__}: {exc}")
@@ -62,6 +69,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Static file serving for uploaded images
+UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "..", "uploads")
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
 
 # ── Health Check (used by Render to detect ready state) ──
