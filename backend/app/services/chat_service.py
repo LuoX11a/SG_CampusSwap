@@ -58,19 +58,21 @@ class ChatService:
             "id": str(room.id),
             "participants": participants,
             "item_id": item_id,
-            "last_message": {
-                "text": initial_message[:100] if initial_message else "",
-                "sender_id": sender_id or "",
-                "sent_at": msg.sent_at.isoformat() if initial_message and sender_id else "",
-            } if initial_message else None,
+            "last_message": (
+                {
+                    "text": initial_message[:100] if initial_message else "",
+                    "sender_id": sender_id or "",
+                    "sent_at": msg.sent_at.isoformat() if initial_message and sender_id else "",
+                }
+                if initial_message
+                else None
+            ),
             "created_at": room.created_at.isoformat(),
         }
 
     async def get_room(self, room_id: str) -> Optional[Dict[str, Any]]:
         async with await self._get_session() as db:
-            result = await db.execute(
-                select(ChatRoom).where(ChatRoom.id == room_id)
-            )
+            result = await db.execute(select(ChatRoom).where(ChatRoom.id == room_id))
             room = result.scalar_one_or_none()
             if not room:
                 return None
@@ -122,9 +124,7 @@ class ChatService:
 
             # Update room's last_message_at
             await db.execute(
-                update(ChatRoom)
-                .where(ChatRoom.id == room_id)
-                .values(last_message_at=msg.sent_at)
+                update(ChatRoom).where(ChatRoom.id == room_id).values(last_message_at=msg.sent_at)
             )
             await db.commit()
 
@@ -168,9 +168,7 @@ class ChatService:
     async def mark_as_read(self, room_id: str, message_id: str):
         async with await self._get_session() as db:
             await db.execute(
-                update(ChatMessage)
-                .where(ChatMessage.id == message_id)
-                .values(read=True)
+                update(ChatMessage).where(ChatMessage.id == message_id).values(read=True)
             )
             await db.commit()
 
@@ -195,18 +193,19 @@ class ChatService:
         async with await self._get_session() as db:
             # Check if a room already exists between these two users
             result = await db.execute(
-                select(ChatRoom)
-                .where(ChatRoom.participants.contains([user_id_1]))
+                select(ChatRoom).where(ChatRoom.participants.contains([user_id_1]))
             )
             for room in result.scalars().all():
                 if user_id_2 in room.participants:
                     return str(room.id)
 
         # Create a new room
-        return (await self.create_room(
-            participants=[user_id_1, user_id_2],
-            item_id=item_id,
-        ))["id"]
+        return (
+            await self.create_room(
+                participants=[user_id_1, user_id_2],
+                item_id=item_id,
+            )
+        )["id"]
 
     async def create_chat(
         self,

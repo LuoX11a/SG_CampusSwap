@@ -64,10 +64,7 @@ async def upload_to_cloudinary(
     # Fallback: placeholder image (colored SVG via data URI would be better,
     # but this keeps the app working when filesystem is read-only).
     return {
-        "secure_url": (
-            "https://placehold.co/400x300/e2e8f0/64748b"
-            "?text=SG+CampusSwap"
-        ),
+        "secure_url": ("https://placehold.co/400x300/e2e8f0/64748b" "?text=SG+CampusSwap"),
         "public_id": f"placeholder/{uuid.uuid4().hex[:8]}",
         "width": 400,
         "height": 300,

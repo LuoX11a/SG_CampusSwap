@@ -453,9 +453,7 @@ async def get_item_transactions(
     if item.seller_id != current_user.id:
         raise HTTPException(status_code=403, detail="Only the seller can view transactions")
 
-    result = await db.execute(
-        select(Transaction).where(Transaction.item_id == item_id)
-    )
+    result = await db.execute(select(Transaction).where(Transaction.item_id == item_id))
     txns = result.scalars().all()
     return {
         "transactions": [

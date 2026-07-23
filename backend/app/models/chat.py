@@ -15,9 +15,7 @@ from app.database import Base
 class ChatRoom(Base):
     __tablename__ = "chat_rooms"
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
-    )
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     participants: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
     item_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("items.id", ondelete="SET NULL"), nullable=True
@@ -25,9 +23,7 @@ class ChatRoom(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )
-    last_message_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
+    last_message_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     messages = relationship("ChatMessage", back_populates="room", order_by="ChatMessage.sent_at")
 
@@ -35,9 +31,7 @@ class ChatRoom(Base):
 class ChatMessage(Base):
     __tablename__ = "chat_messages"
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
-    )
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     room_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("chat_rooms.id", ondelete="CASCADE"),
