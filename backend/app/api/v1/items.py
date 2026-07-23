@@ -11,7 +11,7 @@ PATCH  /api/v1/items/{id}/status — Mark as sold/reserved/available
 
 from datetime import datetime, timezone
 from typing import Optional, List
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
@@ -358,3 +358,113 @@ async def update_item_status(
     await db.refresh(item)
 
     return item_to_response(item)
+
+
+# ── Transaction Endpoints ──────────────────────────────────────────
+
+
+@router.post("/{item_id}/transaction", status_code=201)
+async def create_transaction(
+    item_id: UUID,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Create a transaction for an item (initiated by buyer)."""
+    from app.models.review import Transaction, TransactionStatus
+
+    item = await db.get(Item, item_id)
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+    if item.seller_id == current_user.id:
+        raise HTTPException(status_code=400, detail="Cannot buy your own item")
+    if item.status != ItemStatus.available:
+        raise HTTPException(status_code=400, detail="Item is not available")
+
+    # Check for existing pending transaction
+    result = await db.execute(
+        select(Transaction).where(
+            Transaction.item_id == item_id,
+            Transaction.buyer_id == current_user.id,
+            Transaction.status == TransactionStatus.pending,
+        )
+    )
+    if result.scalar_one_or_none():
+        raise HTTPException(status_code=409, detail="Transaction already exists")
+
+    txn = Transaction(
+        id=uuid4(),
+        item_id=item_id,
+        buyer_id=current_user.id,
+        seller_id=item.seller_id,
+        status=TransactionStatus.pending,
+    )
+    db.add(txn)
+    await db.commit()
+
+    return {
+        "id": str(txn.id),
+        "item_id": str(item_id),
+        "buyer_id": str(current_user.id),
+        "seller_id": str(item.seller_id),
+        "status": "pending",
+    }
+
+
+@router.post("/{item_id}/transaction/{txn_id}/complete")
+async def complete_transaction(
+    item_id: UUID,
+    txn_id: UUID,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Complete a transaction (seller confirms)."""
+    from app.models.review import Transaction, TransactionStatus
+
+    txn = await db.get(Transaction, txn_id)
+    if not txn:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+    if txn.seller_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Only the seller can complete a transaction")
+    if txn.status != TransactionStatus.pending:
+        raise HTTPException(status_code=400, detail="Transaction is not pending")
+
+    txn.status = TransactionStatus.completed
+    txn.completed_at = datetime.now(timezone.utc)
+    item = await db.get(Item, item_id)
+    if item:
+        item.status = ItemStatus.sold
+    await db.commit()
+
+    return {"id": str(txn.id), "status": "completed"}
+
+
+@router.get("/{item_id}/transactions")
+async def get_item_transactions(
+    item_id: UUID,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Get transactions for an item (seller only)."""
+    from app.models.review import Transaction
+
+    item = await db.get(Item, item_id)
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+    if item.seller_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Only the seller can view transactions")
+
+    result = await db.execute(
+        select(Transaction).where(Transaction.item_id == item_id)
+    )
+    txns = result.scalars().all()
+    return {
+        "transactions": [
+            {
+                "id": str(t.id),
+                "buyer_id": str(t.buyer_id),
+                "status": t.status.value,
+                "created_at": t.created_at.isoformat() if t.created_at else None,
+            }
+            for t in txns
+        ]
+    }
