@@ -1,13 +1,26 @@
 """
-Cloudinary Image Upload Service
+Local File Upload Service
 
-Handles image upload, transformation, and deletion via Cloudinary.
-Free tier: 25 GB storage, 25 GB bandwidth/month.
+Stores uploaded images on the local filesystem and serves them
+via FastAPI StaticFiles.  Falls back to placeholder URLs when
+the uploads directory is not writable (e.g. Render ephemeral storage).
 """
 
-import hashlib
-import time
+import os
+import uuid
 from typing import Dict, Any
+
+UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "uploads")
+ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".heic"}
+
+
+def _ensure_upload_dir() -> bool:
+    """Create uploads directory if it doesn't exist. Returns True on success."""
+    try:
+        os.makedirs(UPLOAD_DIR, exist_ok=True)
+        return True
+    except OSError:
+        return False
 
 
 async def upload_to_cloudinary(
@@ -17,81 +30,65 @@ async def upload_to_cloudinary(
     folder: str = "sg-campusswap",
 ) -> Dict[str, Any]:
     """
-    Upload an image to Cloudinary.
+    Save an uploaded image to local storage.
 
-    In production, uses Cloudinary SDK:
-        import cloudinary.uploader
-        result = cloudinary.uploader.upload(
-            file_bytes,
-            folder=folder,
-            public_id=f"{user_id}_{int(time.time())}",
-            transformation=[
-                {"width": 1200, "height": 1200, "crop": "limit"},
-                {"quality": "auto", "fetch_format": "auto"},
-            ],
-        )
-
-    For now, returns a structured result for development/mock:
+    Uses the same function signature as the old Cloudinary-based
+    implementation so callers (api/v1/upload.py) don't need to change.
     """
-    # Try real Cloudinary upload
-    try:
-        import cloudinary.uploader
+    ext = ""
+    if "." in original_filename:
+        ext = "." + original_filename.split(".")[-1].lower()
+        if ext not in ALLOWED_EXTENSIONS:
+            ext = ".jpg"
 
-        upload_result = cloudinary.uploader.upload(
-            file_bytes,
-            folder=folder,
-            public_id=f"{user_id}_{int(time.time())}",
-            transformation=[
-                {"width": 1200, "height": 1200, "crop": "limit"},
-                {"quality": "auto", "fetch_format": "auto"},
-            ],
-            resource_type="image",
-        )
-        return {
-            "secure_url": upload_result["secure_url"],
-            "public_id": upload_result["public_id"],
-            "width": upload_result.get("width", 0),
-            "height": upload_result.get("height", 0),
-            "format": upload_result.get("format", ""),
-            "bytes": upload_result.get("bytes", len(file_bytes)),
-        }
-    except Exception:
-        # Fallback: return mock data for development
-        ext = original_filename.split(".")[-1] if "." in original_filename else "jpg"
-        mock_id = hashlib.md5(f"{user_id}_{time.time()}".encode()).hexdigest()[:12]
-        return {
-            "secure_url": f"https://res.cloudinary.com/demo/image/upload/v1/sg-campusswap/{mock_id}.{ext}",  # noqa: E501
-            "public_id": f"sg-campusswap/{mock_id}",
-            "width": 1200,
-            "height": 900,
-            "format": ext,
-            "bytes": len(file_bytes),
-        }
+    if _ensure_upload_dir():
+        # Save to local filesystem
+        file_id = uuid.uuid4().hex[:12]
+        filename = f"{file_id}{ext}"
+        filepath = os.path.join(UPLOAD_DIR, filename)
+        try:
+            with open(filepath, "wb") as f:
+                f.write(file_bytes)
+            base_url = os.environ.get("API_BASE_URL", "http://localhost:8000")
+            return {
+                "secure_url": f"{base_url}/uploads/{filename}",
+                "public_id": filename,
+                "width": 0,
+                "height": 0,
+                "format": ext.lstrip("."),
+                "bytes": len(file_bytes),
+            }
+        except OSError:
+            pass
+
+    # Fallback: placeholder image (colored SVG via data URI would be better,
+    # but this keeps the app working when filesystem is read-only).
+    return {
+        "secure_url": (
+            "https://placehold.co/400x300/e2e8f0/64748b"
+            "?text=SG+CampusSwap"
+        ),
+        "public_id": f"placeholder/{uuid.uuid4().hex[:8]}",
+        "width": 400,
+        "height": 300,
+        "format": ext.lstrip(".") or "jpg",
+        "bytes": len(file_bytes),
+    }
 
 
 async def delete_from_cloudinary(public_id: str) -> bool:
-    """
-    Delete an image from Cloudinary.
-
-    In production, uses Cloudinary SDK:
-        import cloudinary.uploader
-        result = cloudinary.uploader.destroy(public_id)
-        return result.get("result") == "ok"
-    """
+    """Delete a locally stored image by filename."""
+    filepath = os.path.join(UPLOAD_DIR, public_id)
     try:
-        import cloudinary.uploader
-
-        result = cloudinary.uploader.destroy(public_id)
-        return result.get("result") == "ok"
-    except Exception:
-        # Fallback for development
-        return True
+        if os.path.exists(filepath):
+            os.remove(filepath)
+            return True
+        return False
+    except OSError:
+        return False
 
 
 def get_image_url(public_id: str, width: int = 400, height: int = 300) -> str:
-    """Generate a transformed image URL."""
-    return (
-        f"https://res.cloudinary.com/demo/image/upload/"
-        f"w_{width},h_{height},c_fill,q_auto,f_auto/"
-        f"{public_id}"
-    )
+    """Return the local URL for an uploaded image."""
+    base_url = os.environ.get("API_BASE_URL", "")
+    return f"{base_url}/uploads/{public_id}"
